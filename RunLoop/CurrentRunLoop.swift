@@ -41,7 +41,7 @@ private class RunLoopData {
 private let _runLoopData = try! ThreadLocal<RunLoopData>()
 
 private func defaultRunLoopFactory() -> RunLoopType {
-    return RunLoop()
+    return isMainThread() ? RunLoop.main : RunLoop()
 }
 
 public extension RunLoopType {

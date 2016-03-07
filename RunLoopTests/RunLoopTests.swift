@@ -27,13 +27,11 @@ class RunLoopTests: XCTestCase {
         
         var counter = 0
         
-        let main = RunLoop.current as! RunnableRunLoopType
-        
         for _ in 0...1000 {
             dispatch_async(queue) {
-                main.execute {
+                RunLoop.main.execute {
                     if counter == 1000 {
-                        main.stop()
+                        (RunLoop.main as? RunnableRunLoopType)?.stop()
                     }
                     print("lalala:", counter)
                     counter += 1
@@ -41,6 +39,7 @@ class RunLoopTests: XCTestCase {
             }
         }
         
+        let main = RunLoop.main as! RunnableRunLoopType
         main.run()
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.

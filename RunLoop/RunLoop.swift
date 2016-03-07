@@ -26,6 +26,8 @@ public protocol RunLoopType : NonStrictEquatable {
     func execute(task:SafeTask)
     
     var native:Any {get}
+    
+    static var main:RunLoopType {get}
 }
 
 public protocol RunnableRunLoopType : RunLoopType {

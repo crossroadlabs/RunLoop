@@ -32,7 +32,9 @@ public class UVRunLoop : RunnableRunLoopType {
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
-    init() {
+    private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
+    
+    private init(loop:Loop) {
         var personalQueue = MutableAnyContainer(Array<SafeTask>())
         var commonQueue = MutableAnyContainer(Array<SafeTask>())
         var stop = MutableAnyContainer(false)
@@ -45,7 +47,7 @@ public class UVRunLoop : RunnableRunLoopType {
         self._semaphore = sema
         
         //Yes, exactly. Fail in runtime if we can not create a loop
-        self._loop = try! Loop()
+        self._loop = loop
         
         self._caller = try! Prepare(loop: _loop) { _ in
             while !personalQueue.content.isEmpty {
@@ -66,6 +68,10 @@ public class UVRunLoop : RunnableRunLoopType {
                 sema.signal()
             }
         }
+    }
+    
+    convenience init() {
+        self.init(loop: try! Loop())
     }
     
     deinit {
