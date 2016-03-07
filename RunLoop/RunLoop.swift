@@ -31,6 +31,8 @@ public protocol RunLoopType : NonStrictEquatable {
 public protocol RunnableRunLoopType : RunLoopType {
     func run(timeout:Timeout, once:Bool) -> Bool
     func run(until:NSDate, once:Bool) -> Bool
+    
+    func stop()
 }
 
 public extension RunnableRunLoopType {

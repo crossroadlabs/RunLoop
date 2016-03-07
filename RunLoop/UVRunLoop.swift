@@ -25,6 +25,7 @@ public class UVRunLoop : RunnableRunLoopType {
     //wrapping as containers to avoid copying
     private var _personalQueue:MutableAnyContainer<Array<SafeTask>>
     private var _commonQueue:MutableAnyContainer<Array<SafeTask>>
+    private var _stop:MutableAnyContainer<Bool>
     
     private let _loop:Loop
     private let _wake:Async
@@ -34,9 +35,11 @@ public class UVRunLoop : RunnableRunLoopType {
     init() {
         var personalQueue = MutableAnyContainer(Array<SafeTask>())
         var commonQueue = MutableAnyContainer(Array<SafeTask>())
+        var stop = MutableAnyContainer(false)
         
         self._personalQueue = personalQueue
         self._commonQueue = commonQueue
+        self._stop = stop
         
         let sema = Semaphore(value: 1)
         self._semaphore = sema
@@ -45,10 +48,13 @@ public class UVRunLoop : RunnableRunLoopType {
         self._loop = try! Loop()
         
         self._caller = try! Prepare(loop: _loop) { _ in
-            for task in personalQueue.content {
+            while !personalQueue.content.isEmpty {
+                let task = personalQueue.content.removeFirst()
                 task()
+                if stop.content {
+                    break
+                }
             }
-            personalQueue.content.removeAll()
         }
         
         //same with async
@@ -99,6 +105,9 @@ public class UVRunLoop : RunnableRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        defer {
+            self._stop.content = false
+        }
         //yes, fail if so. It's runtime error
         try! _caller.start()
         defer {
@@ -120,11 +129,16 @@ public class UVRunLoop : RunnableRunLoopType {
         }
         while until.timeIntervalSinceNow >= 0 {
             _loop.run(mode)
-            if once {
+            if once || self._stop.content {
                 break
             }
         }
         return timedout
+    }
+    
+    public func stop() {
+        self._stop.content = true
+        _loop.stop()
     }
     
     public func isEqualTo(other: NonStrictEquatable) -> Bool {

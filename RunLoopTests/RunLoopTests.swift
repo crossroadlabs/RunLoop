@@ -25,12 +25,23 @@ class RunLoopTests: XCTestCase {
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         
-        dispatch_async(queue) {
-            RunLoop.current.execute {
-                print("lalala")
+        var counter = 0
+        
+        let main = RunLoop.current as! RunnableRunLoopType
+        
+        for _ in 0...1000 {
+            dispatch_async(queue) {
+                main.execute {
+                    if counter == 1000 {
+                        main.stop()
+                    }
+                    print("lalala:", counter)
+                    counter += 1
+                }
             }
-            (RunLoop.current as! RunnableRunLoopType).run()
         }
+        
+        main.run()
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
