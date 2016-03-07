@@ -28,6 +28,7 @@ public class UVRunLoop : RunnableRunLoopType {
     
     private let _loop:Loop
     private let _wake:Async
+    private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
     init() {
@@ -42,6 +43,14 @@ public class UVRunLoop : RunnableRunLoopType {
         
         //Yes, exactly. Fail in runtime if we can not create a loop
         self._loop = try! Loop()
+        
+        self._caller = try! Prepare(loop: _loop) { _ in
+            for task in personalQueue.content {
+                task()
+            }
+            personalQueue.content.removeAll()
+        }
+        
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
             sema.wait()
@@ -51,6 +60,11 @@ public class UVRunLoop : RunnableRunLoopType {
                 sema.signal()
             }
         }
+    }
+    
+    deinit {
+        _wake.close()
+        _caller.close()
     }
     
     public func semaphore() -> SemaphoreType {
@@ -85,6 +99,13 @@ public class UVRunLoop : RunnableRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        //yes, fail if so. It's runtime error
+        try! _caller.start()
+        defer {
+            //yes, fail if so. It's runtime error
+            try! _caller.stop()
+        }
+        
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
         var timedout:Bool = false
         //yes, fail if so. It's runtime error
@@ -97,7 +118,7 @@ public class UVRunLoop : RunnableRunLoopType {
         defer {
             timer.close()
         }
-        while until.timeIntervalSinceNow <= 0 {
+        while until.timeIntervalSinceNow >= 0 {
             _loop.run(mode)
             if once {
                 break
