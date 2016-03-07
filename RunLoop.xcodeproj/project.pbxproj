@@ -10,6 +10,15 @@
 		658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31341C8DA70D009CCC7A /* RunLoop.framework */; };
 		658C31441C8DA70D009CCC7A /* RunLoopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31431C8DA70D009CCC7A /* RunLoopTests.swift */; };
 		658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C314E1C8DAA8D009CCC7A /* RunLoop.swift */; };
+		658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; };
+		658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; };
+		658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; };
+		658C31601C8DACED009CCC7A /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; };
+		658C31611C8DACED009CCC7A /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; };
+		658C31621C8DACED009CCC7A /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; };
+		658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,6 +31,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		658C31631C8DACF8009CCC7A /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */,
+				658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */,
+				658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		658C31341C8DA70D009CCC7A /* RunLoop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RunLoop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		658C31391C8DA70D009CCC7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -29,6 +54,12 @@
 		658C31431C8DA70D009CCC7A /* RunLoopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunLoopTests.swift; sourceTree = "<group>"; };
 		658C31451C8DA70D009CCC7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		658C314E1C8DAA8D009CCC7A /* RunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoop.swift; sourceTree = "<group>"; };
+		658C31541C8DACCB009CCC7A /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
+		658C31551C8DACCB009CCC7A /* Boilerplate.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Boilerplate.framework.dSYM; sourceTree = "<group>"; };
+		658C31561C8DACCB009CCC7A /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
+		658C31571C8DACCB009CCC7A /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
+		658C31581C8DACCB009CCC7A /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
+		658C31591C8DACCB009CCC7A /* UV.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = UV.framework.dSYM; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +67,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */,
+				658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */,
+				658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +78,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */,
+				658C31601C8DACED009CCC7A /* Boilerplate.framework in Frameworks */,
+				658C31611C8DACED009CCC7A /* Result.framework in Frameworks */,
+				658C31621C8DACED009CCC7A /* UV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +92,7 @@
 			children = (
 				658C31361C8DA70D009CCC7A /* RunLoop */,
 				658C31421C8DA70D009CCC7A /* RunLoopTests */,
+				658C31521C8DACCB009CCC7A /* Frameworks */,
 				658C31351C8DA70D009CCC7A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +122,28 @@
 				658C31451C8DA70D009CCC7A /* Info.plist */,
 			);
 			path = RunLoopTests;
+			sourceTree = "<group>";
+		};
+		658C31521C8DACCB009CCC7A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				658C31531C8DACCB009CCC7A /* Mac */,
+			);
+			name = Frameworks;
+			path = Carthage/Build;
+			sourceTree = "<group>";
+		};
+		658C31531C8DACCB009CCC7A /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				658C31541C8DACCB009CCC7A /* Boilerplate.framework */,
+				658C31551C8DACCB009CCC7A /* Boilerplate.framework.dSYM */,
+				658C31561C8DACCB009CCC7A /* Result.framework */,
+				658C31571C8DACCB009CCC7A /* Result.framework.dSYM */,
+				658C31581C8DACCB009CCC7A /* UV.framework */,
+				658C31591C8DACCB009CCC7A /* UV.framework.dSYM */,
+			);
+			path = Mac;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -124,6 +184,7 @@
 				658C313A1C8DA70D009CCC7A /* Sources */,
 				658C313B1C8DA70D009CCC7A /* Frameworks */,
 				658C313C1C8DA70D009CCC7A /* Resources */,
+				658C31631C8DACF8009CCC7A /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -311,6 +372,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -331,6 +396,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -345,6 +414,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
@@ -356,6 +429,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
@@ -382,6 +459,7 @@
 				658C314A1C8DA70D009CCC7A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		658C314B1C8DA70D009CCC7A /* Build configuration list for PBXNativeTarget "RunLoopTests" */ = {
 			isa = XCConfigurationList;
@@ -390,6 +468,7 @@
 				658C314D1C8DA70D009CCC7A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
