@@ -24,6 +24,7 @@ public protocol RunLoopType : NonStrictEquatable {
     func semaphore(value:Int) -> SemaphoreType
     
     func execute(task:SafeTask)
+    func execute(delay:Timeout, task:SafeTask)
     
     var native:Any {get}
     

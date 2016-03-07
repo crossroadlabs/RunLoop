@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import Boilerplate
+
 @testable import RunLoop
 
 class RunLoopTests: XCTestCase {
@@ -27,12 +29,14 @@ class RunLoopTests: XCTestCase {
         
         var counter = 0
         
+        RunLoop.main.execute(.In(timeout: 0.1)) {
+            (RunLoop.current as? RunnableRunLoopType)?.stop()
+            print("The End")
+        }
+        
         for _ in 0...1000 {
             dispatch_async(queue) {
                 RunLoop.main.execute {
-                    if counter == 1000 {
-                        (RunLoop.main as? RunnableRunLoopType)?.stop()
-                    }
                     print("lalala:", counter)
                     counter += 1
                 }
