@@ -19,6 +19,9 @@
 		658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31691C8DB81C009CCC7A /* UVRunLoop.swift */; };
+		658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */; };
+		658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +63,9 @@
 		658C31571C8DACCB009CCC7A /* Result.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = Result.framework.dSYM; sourceTree = "<group>"; };
 		658C31581C8DACCB009CCC7A /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
 		658C31591C8DACCB009CCC7A /* UV.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = UV.framework.dSYM; sourceTree = "<group>"; };
+		658C31691C8DB81C009CCC7A /* UVRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UVRunLoop.swift; sourceTree = "<group>"; };
+		658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentRunLoop.swift; sourceTree = "<group>"; };
+		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,9 @@
 			children = (
 				658C31391C8DA70D009CCC7A /* Info.plist */,
 				658C314E1C8DAA8D009CCC7A /* RunLoop.swift */,
+				658C31691C8DB81C009CCC7A /* UVRunLoop.swift */,
+				658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */,
+				658C31711C8DE57A009CCC7A /* Semaphore.swift */,
 			);
 			path = RunLoop;
 			sourceTree = "<group>";
@@ -254,7 +263,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */,
 				658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */,
+				658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */,
+				658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,6 +326,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -355,6 +369,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;

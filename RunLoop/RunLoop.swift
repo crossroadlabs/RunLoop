@@ -15,3 +15,32 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Boilerplate
+
+public typealias SafeTask = () -> Void
+
+public protocol RunLoopType : NonStrictEquatable {
+    func semaphore() -> SemaphoreType
+    func semaphore(value:Int) -> SemaphoreType
+    
+    func execute(task:SafeTask)
+    
+    var native:Any {get}
+}
+
+public protocol RunnableRunLoopType : RunLoopType {
+    func run(timeout:Timeout, once:Bool) -> Bool
+    func run(until:NSDate, once:Bool) -> Bool
+}
+
+public extension RunnableRunLoopType {
+    func run(timeout:Timeout = .Infinity, once:Bool = false) -> Bool {
+        return self.run(timeout.timeSinceNow(), once: once)
+    }
+    
+    func run(until:NSDate) -> Bool {
+        return self.run(until, once: false)
+    }
+}
+
+typealias RunLoop = UVRunLoop
