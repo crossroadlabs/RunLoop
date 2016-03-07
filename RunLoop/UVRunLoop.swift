@@ -41,7 +41,7 @@ public class UVRunLoop : RunnableRunLoopType {
         self._commonQueue = commonQueue
         self._stop = stop
         
-        let sema = Semaphore(value: 1)
+        let sema = BlockingSemaphore(value: 1)
         self._semaphore = sema
         
         //Yes, exactly. Fail in runtime if we can not create a loop
@@ -120,7 +120,7 @@ public class UVRunLoop : RunnableRunLoopType {
         //yes, fail if so. It's runtime error
         let timer = try! Timer(loop: _loop) {_ in
             timedout = true
-            self._loop.stop()
+            self.stop()
         }
         //yes, fail if so. It's runtime error
         try! timer.start(Timeout(until: until))
