@@ -46,4 +46,4 @@ public extension RunnableRunLoopType {
     }
 }
 
-typealias RunLoop = UVRunLoop
+public typealias RunLoop = UVRunLoop
