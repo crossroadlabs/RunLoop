@@ -59,6 +59,23 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
+    func testNested() {
+        let rl = RunLoop.current as! RunnableRunLoopType
+        let outer = self.expectationWithDescription("outer")
+        rl.execute {
+            let inner = self.expectationWithDescription("inner")
+            rl.execute {
+                inner.fulfill()
+                rl.stop()
+            }
+            rl.run()
+            outer.fulfill()
+            rl.stop()
+        }
+        rl.run()
+        self.waitForExpectationsWithTimeout(2, handler: nil)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
