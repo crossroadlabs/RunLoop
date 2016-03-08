@@ -106,15 +106,21 @@ public class UVRunLoop : RunnableRunLoopType {
     public func execute(delay:Timeout, task:SafeTask) {
         let endTime = delay.timeSinceNow()
         execute {
-            //yes, this is a runtime error
-            let timer = try! Timer(loop: self._loop) { timer in
-                defer {
-                    timer.close()
+            let timeout = Timeout(until: endTime)
+            switch timeout {
+            case .Immediate:
+                self.execute(task)
+            default:
+                //yes, this is a runtime error
+                let timer = try! Timer(loop: self._loop) { timer in
+                    defer {
+                        timer.close()
+                    }
+                    task()
                 }
-                task()
+                //yes, this is a runtime error
+                try! timer.start(timeout)
             }
-            //yes, this is a runtime error
-            try! timer.start(Timeout(until: endTime))
         }
     }
     

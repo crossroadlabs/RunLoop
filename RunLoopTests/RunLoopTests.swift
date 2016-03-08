@@ -49,6 +49,16 @@ class RunLoopTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
+    func testImmediateTimeout() {
+        let expectation = self.expectationWithDescription("OK TIMER")
+        RunLoop.current.execute(.Immediate) {
+            expectation.fulfill()
+            (RunLoop.current as? RunnableRunLoopType)?.stop()
+        }
+        (RunLoop.current as? RunnableRunLoopType)?.run()
+        self.waitForExpectationsWithTimeout(2, handler: nil)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
