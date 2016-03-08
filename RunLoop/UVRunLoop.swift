@@ -70,7 +70,7 @@ public class UVRunLoop : RunnableRunLoopType {
         }
     }
     
-    convenience init() {
+    public convenience required init() {
         self.init(loop: try! Loop())
     }
     
@@ -80,11 +80,11 @@ public class UVRunLoop : RunnableRunLoopType {
     }
     
     public func semaphore() -> SemaphoreType {
-        return Semaphore()
+        return RunLoopSemaphore()
     }
     
     public func semaphore(value:Int) -> SemaphoreType {
-        return Semaphore(value: value)
+        return RunLoopSemaphore(value: value)
     }
     
     public func execute(task:SafeTask) {

@@ -122,3 +122,145 @@ public class BlockingSemaphore : SemaphoreType {
         return value
     }
 }
+
+class HashableAnyContainer<T> : AnyContainer<T>, Hashable {
+    let guid = NSUUID()
+    let hashValue: Int
+    
+    override init(_ item: T) {
+        hashValue = self.guid.hashValue
+        super.init(item)
+    }
+}
+
+func ==<T>(lhs:HashableAnyContainer<T>, rhs:HashableAnyContainer<T>) -> Bool {
+    return lhs.guid == rhs.guid
+}
+
+private enum Wakeable {
+    case Loop(loop:RunnableRunLoopType)
+    case Sema(sema:SemaphoreType)
+}
+
+private extension Wakeable {
+    init(loop:RunLoopType) {
+        if let loop = loop as? RunnableRunLoopType {
+            self = .Loop(loop: loop)
+        } else {
+            self = .Sema(sema: loop.semaphore())
+        }
+    }
+    
+    func waitWithConditionalDate(until:NSDate?) -> Bool {
+        switch self {
+        case .Loop(let loop):
+            if let until = until {
+                return loop.run(Timeout(until: until))
+            } else {
+                return loop.run()
+            }
+        case .Sema(let sema):
+            if let until = until {
+                return sema.wait(until)
+            } else {
+                return sema.wait()
+            }
+        }
+    }
+    
+    func wake(task:SafeTask) {
+        switch self {
+        case .Loop(let loop):
+            loop.execute {
+                task()
+                loop.stop()
+            }
+        case .Sema(let sema):
+            task()
+            sema.signal()
+        }
+    }
+}
+
+public class RunLoopSemaphore : SemaphoreType {
+    private var signals:[HashableAnyContainer<SafeTask>]
+    private let lock:NSLock
+    private var value:Int
+    
+    public required convenience init() {
+        self.init(value: 0)
+    }
+    
+    public required init(value: Int) {
+        self.value = value
+        signals = Array()
+        lock = NSLock()
+    }
+    
+    private func waitWithConditionalDate(until:NSDate?) -> Bool {
+        lock.lock()
+        value -= 1
+        defer {
+            lock.unlock()
+        }
+        
+        if value >= 0 {
+            value += 1
+            return true
+        }
+        
+        var signaled = false
+        var timedout = false
+        
+        let loop = RunLoop.current
+        let wakeable:Wakeable = Wakeable(loop: loop)
+        
+        let signal = HashableAnyContainer {
+            wakeable.wake {
+                signaled = true
+            }
+        }
+        
+        signals.append(signal)
+        
+        while value < 0 {
+            lock.unlock()
+            defer {
+                lock.lock()
+            }
+            while !signaled && !timedout {
+                timedout = wakeable.waitWithConditionalDate(until)
+            }
+            
+            if timedout {
+                break
+            }
+        }
+        
+        let index = signals.indexOf { element in
+            element == signal
+        }
+        if let index = index {
+            signals.removeAtIndex(index)
+        }
+        
+        return signaled
+    }
+    
+    public func wait() -> Bool {
+        return waitWithConditionalDate(nil)
+    }
+    
+    public func wait(until:NSDate) -> Bool {
+        return waitWithConditionalDate(until)
+    }
+    
+    public func signal() -> Int {
+        lock.lock()
+        value += 1
+        let signal:AnyContainer<SafeTask>? = signals.isEmpty ? nil : signals.removeFirst()
+        lock.unlock()
+        signal?.content()
+        return 1
+    }
+}

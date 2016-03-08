@@ -43,8 +43,8 @@ class RunLoopTests: XCTestCase {
             }
         }
         
-        let main = RunLoop.main as! RunnableRunLoopType
-        main.run()
+        let main = (RunLoop.main as? RunnableRunLoopType)
+        main?.run()
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
@@ -60,20 +60,32 @@ class RunLoopTests: XCTestCase {
     }
     
     func testNested() {
-        let rl = RunLoop.current as! RunnableRunLoopType
+        let rl = RunLoop.current as? RunnableRunLoopType
         let outer = self.expectationWithDescription("outer")
-        rl.execute {
-            let inner = self.expectationWithDescription("inner")
-            rl.execute {
+        let inner = self.expectationWithDescription("inner")
+        RunLoop.current.execute {
+            RunLoop.current.execute {
                 inner.fulfill()
-                rl.stop()
+                rl?.stop()
             }
-            rl.run()
+            rl?.run()
             outer.fulfill()
-            rl.stop()
+            rl?.stop()
         }
-        rl.run()
+        rl?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
+    }
+    
+    func testSemaphoreExternal() {
+        let loop = UVRunLoop()
+        let sema = loop.semaphore()
+        let dispatchLoop = DispatchRunLoop()
+        
+        dispatchLoop.execute {
+            sema.signal()
+        }
+        
+        XCTAssert(sema.wait(.In(timeout: 1)))
     }
     
     func testPerformanceExample() {

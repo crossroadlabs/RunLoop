@@ -18,6 +18,8 @@ import Foundation
 import Boilerplate
 
 public protocol RunLoopType : NonStrictEquatable {
+    init()
+    
     func semaphore() -> SemaphoreType
     func semaphore(value:Int) -> SemaphoreType
     
@@ -46,4 +48,4 @@ public extension RunnableRunLoopType {
     }
 }
 
-public typealias RunLoop = UVRunLoop
+public typealias RunLoop = DispatchRunLoop
