@@ -17,8 +17,6 @@
 import Foundation
 import Boilerplate
 
-public typealias SafeTask = () -> Void
-
 public protocol RunLoopType : NonStrictEquatable {
     func semaphore() -> SemaphoreType
     func semaphore(value:Int) -> SemaphoreType
