@@ -48,4 +48,26 @@ public extension RunnableRunLoopType {
     }
 }
 
-public typealias RunLoop = DispatchRunLoop
+#if os(Linux)
+    #if dispatch
+        #if nouv
+            public typealias RunLoop = DispatchRunLoop
+        #else
+            public typealias RunLoop = UVRunLoop
+        #endif
+    #else
+        #if nouv
+            private func error() {
+                let error = "You can not use 'nouv' key' without dispatch support"
+            }
+        #else
+            public typealias RunLoop = UVRunLoop
+        #endif
+    #endif
+#else
+    #if nouv
+        public typealias RunLoop = DispatchRunLoop
+    #else
+        public typealias RunLoop = UVRunLoop
+    #endif
+#endif
