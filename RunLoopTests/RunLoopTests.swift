@@ -49,6 +49,30 @@ class RunLoopTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
+    func testUrgent() {
+        let loop = UVRunLoop()
+        
+        var counter = 1
+        
+        let execute = self.expectationWithDescription("execute")
+        loop.execute {
+            XCTAssertEqual(2, counter)
+            execute.fulfill()
+            loop.stop()
+        }
+        
+        let urgent = self.expectationWithDescription("urgent")
+        loop.urgent {
+            XCTAssertEqual(1, counter)
+            counter += 1
+            urgent.fulfill()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(1, handler: nil)
+    }
+    
     func testImmediateTimeout() {
         let expectation = self.expectationWithDescription("OK TIMER")
         RunLoop.current.execute(.Immediate) {

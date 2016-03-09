@@ -55,10 +55,10 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
-        var personalQueue = MutableAnyContainer(Array<UVRunLoopTask>())
-        var commonQueue = MutableAnyContainer(Array<UVRunLoopTask>())
-        var stop = MutableAnyContainer(false)
-        var relay:MutableAnyContainer<RunLoopType?> = MutableAnyContainer(nil)
+        let personalQueue = MutableAnyContainer(Array<UVRunLoopTask>())
+        let commonQueue = MutableAnyContainer(Array<UVRunLoopTask>())
+        let stop = MutableAnyContainer(false)
+        let relay:MutableAnyContainer<RunLoopType?> = MutableAnyContainer(nil)
         
         self._personalQueue = personalQueue
         self._commonQueue = commonQueue

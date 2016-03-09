@@ -18,6 +18,14 @@ import Foundation
 import Boilerplate
 
 public extension RunLoopType {
+    public func urgent(task:SafeTask) {
+        if let relayable = self as? RelayRunLoopType {
+            relayable.urgent(true, task: task)
+        } else {
+            self.execute(task)
+        }
+    }
+
     //anyways must be reimplemented in non-relayable runloop
     func execute(task: SafeTask) {
         guard let relayable = self as? RelayRunLoopType else {
