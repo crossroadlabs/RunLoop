@@ -108,6 +108,18 @@ class RunLoopTests: XCTestCase {
         }
         
         loop.run()
+        
+        loop.relay = nil
+        
+        let immediate2 = self.expectationWithDescription("immediate2")
+        loop.execute {
+            XCTAssertFalse(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate2.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
         self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
