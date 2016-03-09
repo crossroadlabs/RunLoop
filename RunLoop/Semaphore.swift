@@ -145,9 +145,12 @@ private enum Wakeable {
 
 private extension Wakeable {
     init(loop:RunLoopType) {
-        if let loop = loop as? RunnableRunLoopType {
+        switch loop {
+        case let loop as RelayRunLoopType where loop.relay != nil:
+            self = .Sema(sema: loop.semaphore())
+        case let loop as RunnableRunLoopType:
             self = .Loop(loop: loop)
-        } else {
+        default:
             self = .Sema(sema: loop.semaphore())
         }
     }
