@@ -110,11 +110,11 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     }
     
     public func semaphore() -> SemaphoreType {
-        return RunLoopSemaphore()
+        return relay?.semaphore() ?? RunLoopSemaphore()
     }
     
     public func semaphore(value:Int) -> SemaphoreType {
-        return RunLoopSemaphore(value: value)
+        return relay?.semaphore(value) ?? RunLoopSemaphore(value: value)
     }
     
     public func execute(relay:Bool, task: SafeTask) {
