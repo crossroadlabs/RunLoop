@@ -147,6 +147,20 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
+    func testAutorelay() {
+        let immediate = self.expectationWithDescription("immediate")
+        RunLoop.main.execute {
+            immediate.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        
+        let timer = self.expectationWithDescription("timer")
+        RunLoop.main.execute(Timeout(timeout: 0.1)) {
+            timer.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
