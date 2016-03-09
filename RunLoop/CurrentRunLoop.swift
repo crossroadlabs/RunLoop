@@ -41,6 +41,21 @@ private class RunLoopData {
 private let _runLoopData = try! ThreadLocal<RunLoopData>()
 
 private func defaultRunLoopFactory() -> RunLoopType {
+    #if !os(Linux) || dispatch
+        if Thread.isMain {
+            dispatch_async(dispatch_get_main_queue()) {
+                if var loop = RunLoop.main as? RelayRunLoopType {
+                    loop.relay = DispatchRunLoop.main
+                    if let runnable = loop as? RunnableRunLoopType {
+                        //skip runtime error
+                        try! Thread.detach {
+                            runnable.run()
+                        }
+                    }
+                }
+            }
+        }
+    #endif
     return Thread.isMain ? RunLoop.main : RunLoop()
 }
 
