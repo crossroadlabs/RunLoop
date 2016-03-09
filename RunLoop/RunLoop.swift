@@ -23,12 +23,20 @@ public protocol RunLoopType : NonStrictEquatable {
     func semaphore() -> SemaphoreType
     func semaphore(value:Int) -> SemaphoreType
     
+    /// tries to execute before other tasks
+    func urgent(task:SafeTask)
     func execute(task:SafeTask)
     func execute(delay:Timeout, task:SafeTask)
     
     var native:Any {get}
     
     static var main:RunLoopType {get}
+}
+
+public extension RunLoopType {
+    func urgent(task:SafeTask) {
+        self.execute(task)
+    }
 }
 
 public protocol RunnableRunLoopType : RunLoopType {

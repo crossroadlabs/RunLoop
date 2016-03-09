@@ -34,6 +34,10 @@ public extension RunLoopType {
         relayable.execute(true, delay: delay, task: task)
     }
     
+    func urgentNoRelay(task:SafeTask) {
+        self.executeNoRelay(task)
+    }
+    
     func executeNoRelay(task:SafeTask) {
         guard let relayable = self as? RelayRunLoopType else {
             self.execute(task)
@@ -54,6 +58,13 @@ public extension RunLoopType {
 public protocol RelayRunLoopType : RunLoopType {
     var relay:RunLoopType? {get set}
     
+    func urgent(relay:Bool, task:SafeTask)
     func execute(relay:Bool, task: SafeTask)
     func execute(relay:Bool, delay:Timeout, task: SafeTask)
+}
+
+public extension RelayRunLoopType {
+    func urgent(relay:Bool, task:SafeTask) {
+        self.execute(relay, task: task)
+    }
 }

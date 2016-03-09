@@ -22,10 +22,12 @@ import CUV
 private struct UVRunLoopTask {
     let task: SafeTask
     let relay: Bool
+    let urgent:Bool
     
-    init(task: SafeTask, relay: Bool) {
+    init(task: SafeTask, relay: Bool, urgent:Bool) {
         self.task = task
         self.relay = relay
+        self.urgent = urgent
     }
 }
 
@@ -92,11 +94,17 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
             sema.wait()
-            personalQueue.content.appendContentsOf(commonQueue.content)
-            commonQueue.content.removeAll()
-            defer {
-                sema.signal()
+            let urgents = commonQueue.content.filter { task in
+                task.urgent
+            }.reverse()
+            let commons = commonQueue.content.filter { task in
+                !task.urgent
             }
+            commonQueue.content.removeAll()
+            sema.signal()
+            
+            personalQueue.content.insertContentsOf(urgents, at: commonQueue.content.startIndex)
+            personalQueue.content.appendContentsOf(commons)
         }
     }
     
@@ -118,11 +126,23 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     }
     
     public func execute(relay:Bool, task: SafeTask) {
-        let task = UVRunLoopTask(task: task, relay: relay)
+        self.execute(relay, urgent: false, task: task)
+    }
+    
+    public func urgent(relay:Bool, task: SafeTask) {
+        self.execute(relay, urgent: true, task: task)
+    }
+    
+    public func execute(relay:Bool, urgent:Bool, task: SafeTask) {
+        let task = UVRunLoopTask(task: task, relay: relay, urgent: urgent)
         
         if RunLoop.current.isEqualTo(self) {
             //here we are safe to be lock-less
-            _personalQueue.content.append(task)
+            if urgent {
+                _personalQueue.content.insert(task, atIndex: _personalQueue.content.startIndex)
+            } else {
+                _personalQueue.content.append(task)
+            }
         } else {
             do {
                 _semaphore.wait()
