@@ -42,9 +42,6 @@ class RunLoopTests: XCTestCase {
                 }
             }
         }
-        
-        let main = (RunLoop.main as? RunnableRunLoopType)
-        main?.run()
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
@@ -77,26 +74,24 @@ class RunLoopTests: XCTestCase {
         let expectation = self.expectationWithDescription("OK TIMER")
         RunLoop.current.execute(.Immediate) {
             expectation.fulfill()
-            (RunLoop.current as? RunnableRunLoopType)?.stop()
         }
-        (RunLoop.current as? RunnableRunLoopType)?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
     func testNested() {
-        let rl = RunLoop.current as? RunnableRunLoopType
+        let loop = UVRunLoop()
         let outer = self.expectationWithDescription("outer")
         let inner = self.expectationWithDescription("inner")
-        RunLoop.current.execute {
-            RunLoop.current.execute {
+        loop.execute {
+            loop.execute {
                 inner.fulfill()
-                rl?.stop()
+                loop.stop()
             }
-            rl?.run()
+            loop.run()
             outer.fulfill()
-            rl?.stop()
+            loop.stop()
         }
-        rl?.run()
+        loop.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
