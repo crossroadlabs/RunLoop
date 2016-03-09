@@ -136,7 +136,7 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     public func execute(relay:Bool, urgent:Bool, task: SafeTask) {
         let task = UVRunLoopTask(task: task, relay: relay, urgent: urgent)
         
-        if _relay.content == nil && RunLoop.current.isEqualTo(self) {
+        if self.relay == nil && RunLoop.current.isEqualTo(self) {
             //here we are safe to be lock-less
             if urgent {
                 _personalQueue.content.insert(task, atIndex: _personalQueue.content.startIndex)
