@@ -24,6 +24,7 @@
 		658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31691C8DB81C009CCC7A /* UVRunLoop.swift */; };
 		658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */; };
 		658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
+		659B9BD71C91B3B000C8CC18 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659B9BD61C91B3B000C8CC18 /* Sync.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 		658C31691C8DB81C009CCC7A /* UVRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UVRunLoop.swift; sourceTree = "<group>"; };
 		658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentRunLoop.swift; sourceTree = "<group>"; };
 		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
+		659B9BD61C91B3B000C8CC18 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 				658C31391C8DA70D009CCC7A /* Info.plist */,
 				658C314E1C8DAA8D009CCC7A /* RunLoop.swift */,
 				65538C391C9018950080D0CA /* Relay.swift */,
+				659B9BD61C91B3B000C8CC18 /* Sync.swift */,
 				658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */,
 				658C31711C8DE57A009CCC7A /* Semaphore.swift */,
 				658C31691C8DB81C009CCC7A /* UVRunLoop.swift */,
@@ -274,6 +277,7 @@
 				65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */,
 				658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */,
 				658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */,
+				659B9BD71C91B3B000C8CC18 /* Sync.swift in Sources */,
 				658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

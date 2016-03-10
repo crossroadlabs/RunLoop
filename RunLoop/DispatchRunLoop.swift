@@ -18,6 +18,7 @@
     import Foundation
     import Dispatch
     
+    import Result
     import Boilerplate
     
     public class DispatchSemaphore : SemaphoreType {
@@ -87,6 +88,31 @@
                 }
                 task()
             }
+        }
+        
+        private func dispatchSync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+            //rethrow hack
+            return try {
+                if RunLoop.current.isEqualTo(self) && (RunLoop.current as? RelayRunLoopType)?.relay == nil {
+                    return try task()
+                }
+                
+                var result:Result<ReturnType, AnyError>?
+                
+                dispatch_sync(_queue) {
+                    result = materializeAny(task)
+                }
+                
+                return try result!.dematerializeAny()
+                }()
+        }
+        
+        public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
+            return try dispatchSync(task)
+        }
+        
+        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+            return try dispatchSync(task)
         }
         
         public var native:Any {

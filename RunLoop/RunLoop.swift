@@ -28,6 +28,9 @@ public protocol RunLoopType : NonStrictEquatable {
     func execute(task:SafeTask)
     func execute(delay:Timeout, task:SafeTask)
     
+    func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType
+    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType
+    
     var native:Any {get}
     
     static var main:RunLoopType {get}

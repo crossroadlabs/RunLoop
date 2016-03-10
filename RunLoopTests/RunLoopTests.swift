@@ -156,6 +156,77 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
+    enum TestError : ErrorType {
+        case E1
+        case E2
+    }
+    
+    func testSyncToDispatch() {
+        let dispatchLoop = DispatchRunLoop()
+        
+        let result = dispatchLoop.sync {
+            return "result"
+        }
+        
+        XCTAssertEqual(result, "result")
+        
+        let fail = self.expectationWithDescription("failed")
+        
+        do {
+            try dispatchLoop.sync {
+                throw TestError.E1
+            }
+            XCTFail("shoud not reach this")
+        } catch let e as TestError {
+            XCTAssertEqual(e, TestError.E1)
+            fail.fulfill()
+        } catch {
+            XCTFail("shoud not reach this")
+        }
+        
+        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+    }
+    
+    func testSyncToRunLoop() {
+        let sema = RunLoop.current.semaphore()
+        var loop:RunLoopType = RunLoop.current
+        let thread = try! Thread {
+            loop = RunLoop.current
+            sema.signal()
+            (loop as? RunnableRunLoopType)?.run()
+        }
+        sema.wait()
+        
+        XCTAssertFalse(loop.isEqualTo(RunLoop.current))
+        
+        let result = loop.sync {
+            return "result"
+        }
+        
+        XCTAssertEqual(result, "result")
+        
+        let fail = self.expectationWithDescription("failed")
+        
+        do {
+            try loop.sync {
+                defer {
+                    (loop as? RunnableRunLoopType)?.stop()
+                }
+                throw TestError.E1
+            }
+            XCTFail("shoud not reach this")
+        } catch let e as TestError {
+            XCTAssertEqual(e, TestError.E1)
+            fail.fulfill()
+        } catch {
+            XCTFail("shoud not reach this")
+        }
+        
+        try! thread.join()
+        
+        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
