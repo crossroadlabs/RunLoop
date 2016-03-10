@@ -47,7 +47,7 @@ private func defaultRunLoopFactory() -> RunLoopType {
             dispatch_async(main) {
                 if var loop = RunLoop.main as? RelayRunLoopType {
                     loop.relay = DispatchRunLoop.main
-                    if let loop = loop as? RunnableRunLoopType {
+                    if var loop = loop as? RunnableRunLoopType {
                         struct CleanupData {
                             let thread:Thread
                             let loop:RunnableRunLoopType
@@ -59,12 +59,16 @@ private func defaultRunLoopFactory() -> RunLoopType {
                         }
                         func cleanup(context:UnsafeMutablePointer<Void>) {
                             let data = Unmanaged<AnyContainer<CleanupData>>.fromOpaque(COpaquePointer(context)).takeRetainedValue()
-                            data.content.loop.stop()
+                            var loop = data.content.loop
+                            loop.protected = false
+                            loop.stop()
                             try! data.content.thread.join()
                         }
                         //skip runtime error
                         let thread = try! Thread {
+                            loop.protected = true
                             loop.run()
+                            print("!@#$%^%$#@!@#$%^%$#@!@#$%^%$#@!@#$%")
                         }
                         
                         let data = CleanupData(thread: thread, loop: loop)

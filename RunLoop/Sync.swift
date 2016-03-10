@@ -21,7 +21,7 @@ import Result
 
 public extension RunLoopType {
     private func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        if RunLoop.current.isEqualTo(self) && (RunLoop.current as? RelayRunLoopType)?.relay == nil {
+        if RunLoop.current.isEqualTo(self) && (self as? RelayRunLoopType)?.relay == nil {
             return try task()
         }
         
@@ -30,8 +30,10 @@ public extension RunLoopType {
         let sema = RunLoop.current.semaphore()
         
         self.execute {
+            defer {
+                sema.signal()
+            }
             result = materializeAny(task)
-            sema.signal()
         }
         
         sema.wait()

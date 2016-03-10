@@ -31,10 +31,21 @@ private struct UVRunLoopTask {
     }
 }
 
+private struct RelayData {
+    let relay:RunLoopType
+    let signature:NSUUID
+    
+    init(relay:RunLoopType, signature:NSUUID) {
+        self.relay = relay
+        self.signature = signature
+    }
+}
+
 public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     typealias Semaphore = BlockingSemaphore
     
     //wrapping as containers to avoid copying
+    private var _relayQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _personalQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _commonQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _stop:MutableAnyContainer<Bool>
@@ -44,22 +55,55 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
-    private var _relay:MutableAnyContainer<RunLoopType?>
+    private var _relay:MutableAnyContainer<RelayData?>
+    
+    public var protected:Bool = false
+    
+    private func newRelayData(relay:RunLoopType?) -> RelayData? {
+        var data:RelayData?
+        
+        switch relay {
+        case .Some(let relay) where _relay.content?.relay.isEqualTo(relay) ?? false:
+            data = RelayData(relay: relay, signature: _relay.content!.signature)
+        case .Some(let relay):
+            data = RelayData(relay: relay, signature: NSUUID())
+        default:
+            data = nil
+        }
+        
+        return data
+    }
     
     public var relay:RunLoopType? {
         didSet {
-            _relay.content = relay
+            let data = newRelayData(relay)
+            let oldData = _relay.content
+            _relay.content = data
+            
+            let new = data.map { data in
+                oldData.map { oldData in
+                    data.relay.isEqualTo(oldData.relay)
+                } ?? true
+            } ?? false
+            
+            if new {
+                if let data = data {
+                    sendRelayRequest(data)
+                }
+            }
         }
     }
     
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
+        let relayQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let personalQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let commonQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let stop = MutableAnyContainer(false)
-        let relay:MutableAnyContainer<RunLoopType?> = MutableAnyContainer(nil)
+        let relay:MutableAnyContainer<RelayData?> = MutableAnyContainer(nil)
         
+        self._relayQueue = relayQueue
         self._personalQueue = personalQueue
         self._commonQueue = commonQueue
         self._stop = stop
@@ -75,19 +119,16 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
             while !personalQueue.content.isEmpty {
                 let task = personalQueue.content.removeFirst()
                 
-                switch relay.content {
-                case .Some(let relay):
-                    if task.relay {
-                        relay.execute(task.task)
-                    } else {
-                        fallthrough
-                    }
-                default:
+                if task.relay {
+                    relayQueue.content.append(task)
+                } else {
                     task.task()
-                    if stop.content {
-                        break
-                    }
                 }
+            }
+            
+            while relay.content == nil && !relayQueue.content.isEmpty {
+                let task = relayQueue.content.removeFirst()
+                task.task()
             }
         }
         
@@ -115,6 +156,43 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     deinit {
         _wake.close()
         _caller.close()
+    }
+    
+    private func sendRelayRequest(data:RelayData) {
+        data.relay.execute {
+            self.relayTasks(data.signature)
+        }
+    }
+    
+    private func relayTasks(signature:NSUUID) {
+        let sema = RunLoop.current.semaphore()
+        
+        self.executeNoRelay {
+            defer {
+                sema.signal()
+            }
+            guard let relay = self._relay.content else {
+                print("CONTENT FAIL")
+                return
+            }
+            
+            if relay.signature != signature {
+                print("SIG FAIL")
+                //we don't process if there is no sig match
+                return
+            }
+            
+            while !self._relayQueue.content.isEmpty {
+                let task = self._relayQueue.content.removeFirst()
+                relay.relay.execute(task.task)
+            }
+            
+            let data = RelayData(relay: relay.relay, signature: NSUUID())
+            self._relay.content = data
+            self.sendRelayRequest(data)
+        }
+        
+        sema.wait()
     }
     
     public func semaphore() -> SemaphoreType {
@@ -229,6 +307,9 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     }
     
     public func stop() {
+        if protected {
+            return
+        }
         if relay != nil {
             self.executeNoRelay {
                 self._stop.content = true
