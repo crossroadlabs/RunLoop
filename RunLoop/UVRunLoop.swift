@@ -35,9 +35,9 @@ public class UVRunLoop : RunnableRunLoopType {
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
-        var personalQueue = MutableAnyContainer(Array<SafeTask>())
-        var commonQueue = MutableAnyContainer(Array<SafeTask>())
-        var stop = MutableAnyContainer(false)
+        let personalQueue = MutableAnyContainer(Array<SafeTask>())
+        let commonQueue = MutableAnyContainer(Array<SafeTask>())
+        let stop = MutableAnyContainer(false)
         
         self._personalQueue = personalQueue
         self._commonQueue = commonQueue
