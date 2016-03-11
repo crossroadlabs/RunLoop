@@ -96,6 +96,7 @@ class RunLoopTests: XCTestCase {
     func testSemaphoreStress() {
         stressSemaphore(RunLoopSemaphore)
         stressSemaphore(BlockingSemaphore)
+        stressSemaphore(DispatchSemaphore)
     }
     
     func testSemaphoreExternal() {
@@ -203,6 +204,41 @@ class RunLoopTests: XCTestCase {
         loop.run()
         
         self.waitForExpectationsWithTimeout(1, handler: nil)
+    }
+    
+    func testBasicRelay() {
+        let dispatchLoop = DispatchRunLoop()
+        let loop = UVRunLoop()
+        loop.relay = dispatchLoop
+        
+        let immediate = self.expectationWithDescription("immediate")
+        let timer = self.expectationWithDescription("timer")
+        
+        loop.execute {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate.fulfill()
+        }
+        
+        loop.execute(.In(timeout: 0.1)) {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            timer.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        loop.relay = nil
+        
+        let immediate2 = self.expectationWithDescription("immediate2")
+        loop.execute {
+            XCTAssertFalse(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate2.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
     func testPerformanceExample() {
