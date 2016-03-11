@@ -108,6 +108,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         
         var requestRelay:SafeTask? = nil
         var callRelayed:Optional<(UVRunLoopTask)->Void> = nil
+        var callTask:Optional<(UVRunLoopTask)->Void> = nil
         
         self._caller = try! Prepare(loop: _loop) { _ in
             var hadRelayed = false
@@ -118,7 +119,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
                     callRelayed?(task)
                     hadRelayed = true
                 } else {
-                    task.task()
+                    callTask?(task)
                 }
                 
                 if stop.content {
@@ -152,6 +153,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         
         requestRelay = self.requestRelay
         callRelayed = self.callRelayed
+        callTask = self.callTask
     }
     
     public convenience required init() {
@@ -184,11 +186,19 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         }
     }
     
+    private func callTask(task:UVRunLoopTask) {
+        if isHome {
+            task.task()
+        } else {
+            self.execute(task)
+        }
+    }
+    
     private func callRelayed(task:UVRunLoopTask) -> Void {
         if self.relay != nil {
             _relayQueue.content.append(task)
         } else {
-            task.task()
+            callTask(task)
         }
     }
     
@@ -271,6 +281,39 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        var finalizer:SafeTask? = {
+            //yes, fail if so. It's runtime error
+            try! self._caller.stop()
+        }
+        defer {
+            finalizer?()
+        }
+        
+        if let appartment = self._appartment where appartment != Thread.current {
+            let sema = BlockingSemaphore()
+            let relay = self.relay
+            let protected = self.protected
+            
+            finalizer = {
+                self.relay = relay
+                self.protected = protected
+                sema.signal()
+            }
+            
+            self.relay = nil
+            self.protected = false
+            
+            let sema2 = BlockingSemaphore()
+            self.urgentNoRelay {
+                sema2.signal()
+                sema.wait()
+            }
+            print("before wait")
+            sema2.wait()
+            print("passed")
+        }
+        
+        
         let appartment = self._appartment
         defer {
             self._appartment = appartment
@@ -281,11 +324,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
             self._stop.content = false
         }
         //yes, fail if so. It's runtime error
-        try! _caller.start()
-        defer {
-            //yes, fail if so. It's runtime error
-            try! _caller.stop()
-        }
+        try! _caller.start() //stops in finalizer, see above
         
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
         var timedout:Bool = false
