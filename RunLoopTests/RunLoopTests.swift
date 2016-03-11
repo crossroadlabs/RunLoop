@@ -76,6 +76,28 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
+    func stressSemaphore<Semaphore: SemaphoreType>(type:Semaphore.Type) {
+        let id = NSUUID().UUIDString
+        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
+        let sema = Semaphore(value: 1)
+        
+        for i in 0...1000 {
+            let expectation = self.expectationWithDescription("expectation \(i)")
+            dispatch_async(queue) {
+                sema.wait()
+                expectation.fulfill()
+                sema.signal()
+            }
+        }
+        
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
+    
+    func testSemaphoreStress() {
+        stressSemaphore(RunLoopSemaphore)
+        stressSemaphore(BlockingSemaphore)
+    }
+    
     func testSemaphoreExternal() {
         let loop = UVRunLoop()
         let sema = loop.semaphore()
