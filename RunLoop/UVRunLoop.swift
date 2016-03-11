@@ -32,6 +32,8 @@ public class UVRunLoop : RunnableRunLoopType {
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
+    private var _appartment:Thread? = nil
+    
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
@@ -62,11 +64,11 @@ public class UVRunLoop : RunnableRunLoopType {
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
             sema.wait()
-            personalQueue.content.appendContentsOf(commonQueue.content)
-            commonQueue.content.removeAll()
             defer {
                 sema.signal()
             }
+            personalQueue.content.appendContentsOf(commonQueue.content)
+            commonQueue.content.removeAll()
         }
     }
     
@@ -88,18 +90,16 @@ public class UVRunLoop : RunnableRunLoopType {
     }
     
     public func execute(task:SafeTask) {
-        if RunLoop.current.isEqualTo(self) {
+        if let appartment = _appartment where appartment == Thread.current {
             //here we are safe to be lock-less
             _personalQueue.content.append(task)
         } else {
-            do {
-                _semaphore.wait()
-                _commonQueue.content.append(task)
-                defer {
-                    _semaphore.signal()
-                }
+            _semaphore.wait()
+            defer {
+                _semaphore.signal()
+                _wake.send()
             }
-            _wake.send()
+            _commonQueue.content.append(task)
         }
     }
     
@@ -132,6 +132,12 @@ public class UVRunLoop : RunnableRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        let appartment = self._appartment
+        defer {
+            self._appartment = appartment
+        }
+        self._appartment = Thread.current
+        
         defer {
             self._stop.content = false
         }
