@@ -64,12 +64,20 @@ private func defaultRunLoopFactory() -> RunLoopType {
                             loop.stop()
                             try! data.content.thread.join()
                         }
+                        
+                        let sema = BlockingSemaphore()
+                        loop.executeNoRelay {
+                            sema.signal()
+                        }
+                        
                         //skip runtime error
                         let thread = try! Thread {
                             loop.protected = true
                             loop.run()
                             print("!@#$%^%$#@!@#$%^%$#@!@#$%^%$#@!@#$%")
                         }
+                        
+                        sema.wait()
                         
                         let data = CleanupData(thread: thread, loop: loop)
                         let arg = UnsafeMutablePointer<Void>(Unmanaged.passRetained(AnyContainer(data)).toOpaque())
