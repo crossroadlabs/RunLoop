@@ -34,6 +34,15 @@ public class UVRunLoop : RunnableRunLoopType {
     
     private var _appartment:Thread? = nil
     
+    public var isHome:Bool {
+        get {
+            guard let appartment = _appartment else {
+                return false
+            }
+            return appartment == Thread.current
+        }
+    }
+    
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
@@ -90,7 +99,7 @@ public class UVRunLoop : RunnableRunLoopType {
     }
     
     public func execute(task:SafeTask) {
-        if let appartment = _appartment where appartment == Thread.current {
+        if isHome {
             //here we are safe to be lock-less
             _personalQueue.content.append(task)
         } else {

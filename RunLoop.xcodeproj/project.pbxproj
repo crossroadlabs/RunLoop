@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65525C171C92D37D002733E2 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C161C92D37D002733E2 /* Sync.swift */; };
 		65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65538C371C8F36650080D0CA /* DispatchRunLoop.swift */; };
 		658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31341C8DA70D009CCC7A /* RunLoop.framework */; };
 		658C31441C8DA70D009CCC7A /* RunLoopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31431C8DA70D009CCC7A /* RunLoopTests.swift */; };
@@ -52,6 +53,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		65525C161C92D37D002733E2 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		65538C371C8F36650080D0CA /* DispatchRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchRunLoop.swift; sourceTree = "<group>"; };
 		658C31341C8DA70D009CCC7A /* RunLoop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RunLoop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		658C31391C8DA70D009CCC7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				658C31391C8DA70D009CCC7A /* Info.plist */,
 				658C314E1C8DAA8D009CCC7A /* RunLoop.swift */,
 				658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */,
+				65525C161C92D37D002733E2 /* Sync.swift */,
 				658C31711C8DE57A009CCC7A /* Semaphore.swift */,
 				658C31691C8DB81C009CCC7A /* UVRunLoop.swift */,
 				65538C371C8F36650080D0CA /* DispatchRunLoop.swift */,
@@ -270,6 +273,7 @@
 				65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */,
 				658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */,
 				658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */,
+				65525C171C92D37D002733E2 /* Sync.swift in Sources */,
 				658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
