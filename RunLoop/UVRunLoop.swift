@@ -19,7 +19,7 @@ import Boilerplate
 import UV
 import CUV
 
-public class UVRunLoop : RunnableRunLoopType {
+public class UVRunLoop : RunnableRunLoopType, SettledType {
     typealias Semaphore = BlockingSemaphore
     
     //wrapping as containers to avoid copying

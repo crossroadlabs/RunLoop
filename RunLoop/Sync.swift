@@ -21,7 +21,7 @@ import Result
 
 public extension RunLoopType {
     private func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        if self.isHome {
+        if let settled = self as? SettledType where settled.isHome {
             return try task()
         }
         

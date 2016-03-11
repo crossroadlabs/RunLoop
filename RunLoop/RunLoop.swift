@@ -17,11 +17,11 @@
 import Foundation
 import Boilerplate
 
-public protocol Settled {
+public protocol SettledType {
     var isHome:Bool {get}
 }
 
-public protocol RunLoopType : NonStrictEquatable, Settled {
+public protocol RunLoopType : NonStrictEquatable {
     init()
     
     func semaphore() -> SemaphoreType

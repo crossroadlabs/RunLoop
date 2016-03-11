@@ -93,7 +93,8 @@
         private func dispatchSync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
             //rethrow hack
             return try {
-                if isHome {
+                //TODO: test
+                if dispatch_queue_get_label(self._queue) == dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) {
                     return try task()
                 }
                 
@@ -118,13 +119,6 @@
         public var native:Any {
             get {
                 return _queue
-            }
-        }
-        
-        public var isHome:Bool {
-            get {
-                //TODO: test
-                return dispatch_queue_get_label(self._queue) == dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)
             }
         }
         
