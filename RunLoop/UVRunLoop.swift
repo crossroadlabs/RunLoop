@@ -19,12 +19,22 @@ import Boilerplate
 import UV
 import CUV
 
+private struct UVRunLoopTask {
+    let task: SafeTask
+    let urgent:Bool
+    
+    init(task: SafeTask, urgent:Bool) {
+        self.task = task
+        self.urgent = urgent
+    }
+}
+
 public class UVRunLoop : RunnableRunLoopType, SettledType {
     typealias Semaphore = BlockingSemaphore
     
     //wrapping as containers to avoid copying
-    private var _personalQueue:MutableAnyContainer<Array<SafeTask>>
-    private var _commonQueue:MutableAnyContainer<Array<SafeTask>>
+    private var _personalQueue:MutableAnyContainer<Array<UVRunLoopTask>>
+    private var _commonQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _stop:MutableAnyContainer<Bool>
     
     private let _loop:Loop
@@ -46,8 +56,8 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
     
     private init(loop:Loop) {
-        let personalQueue = MutableAnyContainer(Array<SafeTask>())
-        let commonQueue = MutableAnyContainer(Array<SafeTask>())
+        let personalQueue = MutableAnyContainer(Array<UVRunLoopTask>())
+        let commonQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let stop = MutableAnyContainer(false)
         
         self._personalQueue = personalQueue
@@ -63,7 +73,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         self._caller = try! Prepare(loop: _loop) { _ in
             while !personalQueue.content.isEmpty {
                 let task = personalQueue.content.removeFirst()
-                task()
+                task.task()
                 if stop.content {
                     break
                 }
@@ -76,8 +86,17 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
             defer {
                 sema.signal()
             }
-            personalQueue.content.appendContentsOf(commonQueue.content)
+            
+            let urgents = commonQueue.content.filter { task in
+                task.urgent
+            }.reverse()
+            let commons = commonQueue.content.filter { task in
+                !task.urgent
+            }
             commonQueue.content.removeAll()
+            
+            personalQueue.content.insertContentsOf(urgents, at: commonQueue.content.startIndex)
+            personalQueue.content.appendContentsOf(commons)
         }
     }
     
@@ -98,10 +117,14 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         return RunLoopSemaphore(value: value)
     }
     
-    public func execute(task:SafeTask) {
+    private func execute(task:UVRunLoopTask) {
         if isHome {
             //here we are safe to be lock-less
-            _personalQueue.content.append(task)
+            if task.urgent {
+                _personalQueue.content.insert(task, atIndex: _personalQueue.content.startIndex)
+            } else {
+                _personalQueue.content.append(task)
+            }
         } else {
             _semaphore.wait()
             defer {
@@ -110,6 +133,16 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
             }
             _commonQueue.content.append(task)
         }
+    }
+    
+    public func urgent(task: SafeTask) {
+        let task = UVRunLoopTask(task: task, urgent: true)
+        self.execute(task)
+    }
+    
+    public func execute(task:SafeTask) {
+        let task = UVRunLoopTask(task: task, urgent: false)
+        self.execute(task)
     }
     
     public func execute(delay:Timeout, task:SafeTask) {

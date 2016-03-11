@@ -181,6 +181,30 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(0.1, handler: nil)
     }
     
+    func testUrgent() {
+        let loop = UVRunLoop()
+        
+        var counter = 1
+        
+        let execute = self.expectationWithDescription("execute")
+        loop.execute {
+            XCTAssertEqual(2, counter)
+            execute.fulfill()
+            loop.stop()
+        }
+        
+        let urgent = self.expectationWithDescription("urgent")
+        loop.urgent {
+            XCTAssertEqual(1, counter)
+            counter += 1
+            urgent.fulfill()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(1, handler: nil)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
