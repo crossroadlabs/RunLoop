@@ -86,17 +86,11 @@ public class BlockingSemaphore : SemaphoreType {
         defer {
             underlyingSemaphore.unlock()
         }
+        value -= 1
         
         var signaled:Bool = true
-        while value <= 0 {
+        if value < 0 {
             signaled = underlyingSemaphore.waitWithConditionalEnd(until)
-            if !signaled {
-                break
-            }
-        }
-        
-        if signaled {
-            value -= 1
         }
         
         return signaled
@@ -225,17 +219,13 @@ public class RunLoopSemaphore : SemaphoreType {
         
         signals.append(signal)
         
-        while value < 0 {
+        if value < 0 {
             lock.unlock()
             defer {
                 lock.lock()
             }
             while !signaled && !timedout {
                 timedout = wakeable.waitWithConditionalDate(until)
-            }
-            
-            if timedout {
-                break
             }
         }
         
