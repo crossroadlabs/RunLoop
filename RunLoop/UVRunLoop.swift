@@ -45,6 +45,8 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
+    public var protected:Bool = false
+    
     private var _appartment:Thread? = nil
     
     public var isHome:Bool {
@@ -307,6 +309,11 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     }
     
     public func stop() {
+        //protected loops can not stop
+        if protected {
+            return
+        }
+        
         if isHome {
             self._stop.content = true
             _loop.stop()
