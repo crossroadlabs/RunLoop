@@ -80,6 +80,7 @@ public class BlockingSemaphore : SemaphoreType {
         self.init(value: BlockingSemaphore.defaultValue)
     }
     
+    //TODO: optimise with atomics for value. Will allow to run not-blocked sema faster
     private func waitWithConditionalDate(until:NSDate?) -> Bool {
         underlyingSemaphore.lock()
         defer {
@@ -197,15 +198,16 @@ public class RunLoopSemaphore : SemaphoreType {
         lock = NSLock()
     }
     
+    //TODO: optimise with atomics for value. Will allow to run non-blocked sema faster
     private func waitWithConditionalDate(until:NSDate?) -> Bool {
         lock.lock()
-        value -= 1
         defer {
             lock.unlock()
         }
         
+        value -= 1
+        
         if value >= 0 {
-            value += 1
             return true
         }
         
