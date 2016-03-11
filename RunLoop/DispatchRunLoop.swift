@@ -54,7 +54,7 @@
     public class DispatchRunLoop: RunLoopType, NonStrictEquatable {
         private let _queue:dispatch_queue_t!
         
-        init(queue:dispatch_queue_t!) {
+        public init(queue:dispatch_queue_t!) {
             self._queue = queue
         }
         
