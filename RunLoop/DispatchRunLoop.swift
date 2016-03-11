@@ -19,6 +19,7 @@
     import Dispatch
     
     import Boilerplate
+    import Result
     
     public class DispatchSemaphore : SemaphoreType {
         let sema:dispatch_semaphore_t
@@ -87,6 +88,32 @@
                 }
                 task()
             }
+        }
+        
+        private func dispatchSync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+            //rethrow hack
+            return try {
+                //TODO: test
+                if dispatch_queue_get_label(self._queue) == dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) {
+                    return try task()
+                }
+                
+                var result:Result<ReturnType, AnyError>?
+                
+                dispatch_sync(_queue) {
+                    result = materializeAny(task)
+                }
+                
+                return try result!.dematerializeAny()
+            }()
+        }
+        
+        public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
+            return try dispatchSync(task)
+        }
+        
+        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+            return try dispatchSync(task)
         }
         
         public var native:Any {

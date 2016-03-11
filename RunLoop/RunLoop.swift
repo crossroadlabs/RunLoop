@@ -17,18 +17,33 @@
 import Foundation
 import Boilerplate
 
+public protocol SettledType {
+    var isHome:Bool {get}
+}
+
 public protocol RunLoopType : NonStrictEquatable {
     init()
     
     func semaphore() -> SemaphoreType
     func semaphore(value:Int) -> SemaphoreType
     
+    /// tries to execute before other tasks
+    func urgent(task:SafeTask)
     func execute(task:SafeTask)
     func execute(delay:Timeout, task:SafeTask)
+    
+    func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType
+    func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType
     
     var native:Any {get}
     
     static var main:RunLoopType {get}
+}
+
+public extension RunLoopType {
+    public func urgent(task:SafeTask) {
+        self.execute(task)
+    }
 }
 
 public protocol RunnableRunLoopType : RunLoopType {

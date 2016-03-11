@@ -76,6 +76,28 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
+    func stressSemaphore<Semaphore: SemaphoreType>(type:Semaphore.Type) {
+        let id = NSUUID().UUIDString
+        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
+        let sema = Semaphore(value: 1)
+        
+        for i in 0...1000 {
+            let expectation = self.expectationWithDescription("expectation \(i)")
+            dispatch_async(queue) {
+                sema.wait()
+                expectation.fulfill()
+                sema.signal()
+            }
+        }
+        
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
+    
+    func testSemaphoreStress() {
+        stressSemaphore(RunLoopSemaphore)
+        stressSemaphore(BlockingSemaphore)
+    }
+    
     func testSemaphoreExternal() {
         let loop = UVRunLoop()
         let sema = loop.semaphore()
@@ -86,6 +108,101 @@ class RunLoopTests: XCTestCase {
         }
         
         XCTAssert(sema.wait(.In(timeout: 1)))
+    }
+    
+    enum TestError : ErrorType {
+        case E1
+        case E2
+    }
+    
+    func testSyncToDispatch() {
+        let dispatchLoop = DispatchRunLoop()
+        
+        let result = dispatchLoop.sync {
+            return "result"
+        }
+        
+        XCTAssertEqual(result, "result")
+        
+        let fail = self.expectationWithDescription("failed")
+        
+        do {
+            try dispatchLoop.sync {
+                throw TestError.E1
+            }
+            XCTFail("shoud not reach this")
+        } catch let e as TestError {
+            XCTAssertEqual(e, TestError.E1)
+            fail.fulfill()
+        } catch {
+            XCTFail("shoud not reach this")
+        }
+        
+        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+    }
+    
+    func testSyncToRunLoop() {
+        let sema = RunLoop.current.semaphore()
+        var loop:RunLoopType = RunLoop.current
+        let thread = try! Thread {
+            loop = RunLoop.current
+            sema.signal()
+            (loop as? RunnableRunLoopType)?.run()
+        }
+        sema.wait()
+        
+        XCTAssertFalse(loop.isEqualTo(RunLoop.current))
+        
+        let result = loop.sync {
+            return "result"
+        }
+        
+        XCTAssertEqual(result, "result")
+        
+        let fail = self.expectationWithDescription("failed")
+        
+        do {
+            try loop.sync {
+                defer {
+                    (loop as? RunnableRunLoopType)?.stop()
+                }
+                throw TestError.E1
+            }
+            XCTFail("shoud not reach this")
+        } catch let e as TestError {
+            XCTAssertEqual(e, TestError.E1)
+            fail.fulfill()
+        } catch {
+            XCTFail("shoud not reach this")
+        }
+        
+        try! thread.join()
+        
+        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+    }
+    
+    func testUrgent() {
+        let loop = UVRunLoop()
+        
+        var counter = 1
+        
+        let execute = self.expectationWithDescription("execute")
+        loop.execute {
+            XCTAssertEqual(2, counter)
+            execute.fulfill()
+            loop.stop()
+        }
+        
+        let urgent = self.expectationWithDescription("urgent")
+        loop.urgent {
+            XCTAssertEqual(1, counter)
+            counter += 1
+            urgent.fulfill()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
     func testPerformanceExample() {
