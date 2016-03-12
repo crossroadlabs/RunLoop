@@ -64,8 +64,8 @@ class RunLoopTests: XCTestCase {
 //        let rl = RunLoop.current as? RunnableRunLoopType
         let outer = self.expectationWithDescription("outer")
         let inner = self.expectationWithDescription("inner")
-        RunLoop.current.execute {
-            RunLoop.current.execute {
+        RunLoop.main.execute {
+            RunLoop.main.execute {
                 inner.fulfill()
 //                rl?.stop()
             }

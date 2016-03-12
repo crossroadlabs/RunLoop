@@ -41,53 +41,6 @@ private class RunLoopData {
 private let _runLoopData = try! ThreadLocal<RunLoopData>()
 
 private func defaultRunLoopFactory() -> RunLoopType {
-    #if !os(Linux) || dispatch
-        if Thread.isMain {
-            let main = dispatch_get_main_queue()
-            dispatch_async(main) {
-                if var loop = RunLoop.main as? RelayRunLoopType {
-                    loop.relay = DispatchRunLoop.main
-                    if var loop = loop as? RunnableRunLoopType {
-                        struct CleanupData {
-                            let thread:Thread
-                            let loop:RunnableRunLoopType
-                            
-                            init(thread:Thread, loop:RunnableRunLoopType) {
-                                self.thread = thread
-                                self.loop = loop
-                            }
-                        }
-                        func cleanup(context:UnsafeMutablePointer<Void>) {
-                            let data = Unmanaged<AnyContainer<CleanupData>>.fromOpaque(COpaquePointer(context)).takeRetainedValue()
-                            var loop = data.content.loop
-                            loop.protected = false
-                            loop.stop()
-                            try! data.content.thread.join()
-                        }
-                        
-                        let sema = BlockingSemaphore()
-                        loop.executeNoRelay {
-                            sema.signal()
-                        }
-                        
-                        //skip runtime error
-                        let thread = try! Thread {
-                            loop.protected = true
-                            loop.run()
-                            print("!@#$%^%$#@!@#$%^%$#@!@#$%^%$#@!@#$%")
-                        }
-                        
-                        sema.wait()
-                        
-                        let data = CleanupData(thread: thread, loop: loop)
-                        let arg = UnsafeMutablePointer<Void>(Unmanaged.passRetained(AnyContainer(data)).toOpaque())
-                        dispatch_set_context(main, arg);
-                        dispatch_set_finalizer_f(main, cleanup)
-                    }
-                }
-            }
-        }
-    #endif
     return Thread.isMain ? RunLoop.main : RunLoop()
 }
 
