@@ -29,6 +29,8 @@ private struct UVRunLoopTask {
     }
 }
 
+private let _currentLoopSignature = try! ThreadLocal<NSUUID>()
+
 public class UVRunLoop : RunnableRunLoopType, SettledType {
     typealias Semaphore = BlockingSemaphore
     
@@ -42,14 +44,15 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
     
-    private var _appartment:Thread? = nil
+    private let _loopSignature:NSUUID = NSUUID()
     
+    private (set) public var isRunning:Bool = false
     public var isHome:Bool {
         get {
-            guard let appartment = _appartment else {
+            guard let currentLoopSignature = _currentLoopSignature.value else {
                 return false
             }
-            return appartment == Thread.current
+            return _loopSignature == currentLoopSignature
         }
     }
     
@@ -174,11 +177,17 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
-        let appartment = self._appartment
+        let currentLoopSignature = _currentLoopSignature.value
         defer {
-            self._appartment = appartment
+            _currentLoopSignature.value = currentLoopSignature
         }
-        self._appartment = Thread.current
+        _currentLoopSignature.value = self._loopSignature
+        
+        let running = self.isRunning
+        defer {
+            self.isRunning = running
+        }
+        self.isRunning = true
         
         defer {
             self._stop.content = false
