@@ -13,16 +13,6 @@ import Boilerplate
 
 class RunLoopTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
     func testExample() {
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
@@ -74,40 +64,6 @@ class RunLoopTests: XCTestCase {
         }
         rl?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
-    }
-    
-    func stressSemaphore<Semaphore: SemaphoreType>(type:Semaphore.Type) {
-        let id = NSUUID().UUIDString
-        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
-        let sema = Semaphore(value: 1)
-        
-        for i in 0...1000 {
-            let expectation = self.expectationWithDescription("expectation \(i)")
-            dispatch_async(queue) {
-                sema.wait()
-                expectation.fulfill()
-                sema.signal()
-            }
-        }
-        
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
-    }
-    
-    func testSemaphoreStress() {
-        stressSemaphore(RunLoopSemaphore)
-        stressSemaphore(BlockingSemaphore)
-    }
-    
-    func testSemaphoreExternal() {
-        let loop = UVRunLoop()
-        let sema = loop.semaphore()
-        let dispatchLoop = DispatchRunLoop()
-        
-        dispatchLoop.execute {
-            sema.signal()
-        }
-        
-        XCTAssert(sema.wait(.In(timeout: 1)))
     }
     
     enum TestError : ErrorType {
@@ -205,11 +161,21 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
-    }
-    
 }
+
+#if os(Linux)
+extension RunLoopTests : XCTestCaseProvider {
+	var allTests : [(String, () throws -> Void)] {
+		return [
+			("testExample", testExample),
+			("testImmediateTimeout", testImmediateTimeout),
+			("testNested", testNested),
+			("testSemaphoreStress", testSemaphoreStress),
+			("testSemaphoreExternal", testSemaphoreExternal),
+			("testSyncToDispatch", testSyncToDispatch),
+			("testSyncToRunLoop", testSyncToRunLoop),
+			("testUrgent", testUrgent),
+		]
+	}
+}
+#endif

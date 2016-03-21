@@ -24,6 +24,9 @@
 		658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31691C8DB81C009CCC7A /* UVRunLoop.swift */; };
 		658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */; };
 		658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
+		9237002B1CA076F8000042BA /* SemaphoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9237002A1CA076F8000042BA /* SemaphoreTests.swift */; };
+		92A9EFEF1CA0671000A62F33 /* LoopTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A9EFEE1CA0671000A62F33 /* LoopTestUtils.swift */; };
+		92A9EFF11CA069EE00A62F33 /* StressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A9EFF01CA069EE00A62F33 /* StressTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +73,9 @@
 		658C31691C8DB81C009CCC7A /* UVRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UVRunLoop.swift; sourceTree = "<group>"; };
 		658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentRunLoop.swift; sourceTree = "<group>"; };
 		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
+		9237002A1CA076F8000042BA /* SemaphoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SemaphoreTests.swift; sourceTree = "<group>"; };
+		92A9EFEE1CA0671000A62F33 /* LoopTestUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoopTestUtils.swift; sourceTree = "<group>"; };
+		92A9EFF01CA069EE00A62F33 /* StressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StressTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,8 +141,12 @@
 			children = (
 				658C31431C8DA70D009CCC7A /* RunLoopTests.swift */,
 				658C31451C8DA70D009CCC7A /* Info.plist */,
+				92A9EFEE1CA0671000A62F33 /* LoopTestUtils.swift */,
+				92A9EFF01CA069EE00A62F33 /* StressTests.swift */,
+				9237002A1CA076F8000042BA /* SemaphoreTests.swift */,
 			);
-			path = RunLoopTests;
+			name = RunLoopTests;
+			path = Tests/RunLoop;
 			sourceTree = "<group>";
 		};
 		658C31521C8DACCB009CCC7A /* Frameworks */ = {
@@ -283,6 +293,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				658C31441C8DA70D009CCC7A /* RunLoopTests.swift in Sources */,
+				9237002B1CA076F8000042BA /* SemaphoreTests.swift in Sources */,
+				92A9EFF11CA069EE00A62F33 /* StressTests.swift in Sources */,
+				92A9EFEF1CA0671000A62F33 /* LoopTestUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +414,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -442,7 +456,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = RunLoopTests/Info.plist;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -457,7 +472,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = RunLoopTests/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
