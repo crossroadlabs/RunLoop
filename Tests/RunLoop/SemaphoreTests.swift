@@ -13,20 +13,22 @@ import Boilerplate
 
 class SemaphoreTests : XCTestCase {
     
+    let taskCount = 1000
+    
     func testBlockingSemaphoreTimeout() {
         let sema = BlockingSemaphore()
-        try! Thread {
+        let _ = try! Thread {
             Thread.sleep(.In(timeout: 2))
             sema.signal()
         }
-        XCTAssert(!sema.wait(.In(timeout: 1)), "Wait not working")
-        XCTAssert(sema.wait(.In(timeout: 2)), "Wait not working")
+        XCTAssert(!sema.wait(.In(timeout: 1)))
+        XCTAssert(sema.wait(.In(timeout: 2)))
     }
     
     func testBlockingSemaphoreManySignalTimeout() {
         let count = 3
         let sema = BlockingSemaphore(value: count)
-        try! Thread {
+        let _ = try! Thread {
             for _ in 0..<count {
                 sema.signal()
                 Thread.sleep(.In(timeout: 2))
@@ -36,16 +38,16 @@ class SemaphoreTests : XCTestCase {
             sema.wait()
         }
         
-        XCTAssert(!sema.wait(.In(timeout: 1)), "Wait not working")
-        XCTAssert(sema.wait(.In(timeout: 2)), "Wait not working")
+        XCTAssert(!sema.wait(.In(timeout: 1)))
+        XCTAssert(sema.wait(.In(timeout: 2)))
     }
     
-    func stressSemaphore<Semaphore: SemaphoreType>(type:Semaphore.Type) {
+    func stressSemaphoreDispatch<Semaphore: SemaphoreType>(type:Semaphore.Type) {
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         let sema = Semaphore(value: 1)
         
-        for i in 0...1000 {
+        for i in 0..<taskCount {
             let expectation = self.expectationWithDescription("expectation \(i)")
             dispatch_async(queue) {
                 sema.wait()
@@ -57,9 +59,47 @@ class SemaphoreTests : XCTestCase {
         self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
-    func testSemaphoreStress() {
-        stressSemaphore(RunLoopSemaphore)
-        stressSemaphore(BlockingSemaphore)
+    func testLoopSemaphoreStressDispatch() {
+        stressSemaphoreDispatch(RunLoopSemaphore)
+    }
+    
+    func testBlockingSemaphoreStressDispatch() {
+        stressSemaphoreDispatch(BlockingSemaphore)
+    }
+    
+    func stressSemaphoreUV<Semaphore: SemaphoreType>(type: Semaphore.Type) {
+        let loopCount = 10
+        var loops:[UVRunLoop] = []
+        let sema = Semaphore(value: 1)
+        
+        for _ in 0..<loopCount {
+            let thAndLoop = threadWithRunLoop(UVRunLoop)
+            loops.append(thAndLoop.loop)
+        }
+        for i in 0..<taskCount {
+            let expectation = self.expectationWithDescription("expectation \(i)")
+            loops[(i % loopCount)].execute {
+                sema.wait()
+                expectation.fulfill()
+                sema.signal()
+            }
+        }
+        
+        defer {
+            for l in loops {
+                l.stop()
+            }
+        }
+        
+        self.waitForExpectationsWithTimeout(1, handler: nil)
+    }
+    
+    func testLoopSemaphoreStressUV() {
+        stressSemaphoreUV(RunLoopSemaphore)
+    }
+    
+    func testBlockingSemaphoreUV() {
+        stressSemaphoreUV(BlockingSemaphore)
     }
     
     func testSemaphoreExternal() {
@@ -73,4 +113,6 @@ class SemaphoreTests : XCTestCase {
         
         XCTAssert(sema.wait(.In(timeout: 1)))
     }
+    
+    
 }

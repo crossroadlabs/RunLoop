@@ -12,6 +12,20 @@ import Foundation
 
 @testable import RunLoop
 
+func threadWithRunLoop<RL: RunLoopType>(type: RL.Type) -> (thread:Thread, loop: RL) {
+    var sema: SemaphoreType
+    sema = BlockingSemaphore()
+    var loop: RL?
+    let thread = try! Thread {
+        loop = RL.current as? RL
+        sema.signal()
+        (loop as? RunnableRunLoopType)?.run()
+    }
+    sema.wait()
+    return (thread, loop!)
+}
+
+
 class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
@@ -28,7 +42,7 @@ class StressTests: XCTestCase {
         var loops = [RunLoopType]()
         
         for _ in 0..<threadCount {
-            let thAndLoop:(thread: Thread, loop:UVRunLoop) = threadWithRunLoop()
+            let thAndLoop = threadWithRunLoop(UVRunLoop)
             loops.append(thAndLoop.loop)
         }
         for _ in 0..<taskCount {
