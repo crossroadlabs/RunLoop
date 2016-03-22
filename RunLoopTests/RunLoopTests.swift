@@ -24,6 +24,12 @@ class RunLoopTests: XCTestCase {
     }
     
     func testExample() {
+        let expectation = self.expectationWithDescription("init dispatch")
+        dispatch_async(dispatch_get_main_queue()) {
+            expectation.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+        
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         
@@ -42,6 +48,9 @@ class RunLoopTests: XCTestCase {
                 }
             }
         }
+        
+        (RunLoop.main as? RunnableRunLoopType)?.run()
+        print("!!!!END!!!")
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }

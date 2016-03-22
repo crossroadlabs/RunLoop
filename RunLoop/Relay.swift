@@ -43,7 +43,11 @@ public extension RunLoopType {
     }
     
     func urgentNoRelay(task:SafeTask) {
-        self.executeNoRelay(task)
+        guard let relayable = self as? RelayRunLoopType else {
+            self.urgent(task)
+            return
+        }
+        relayable.urgent(false, task: task)
     }
     
     func executeNoRelay(task:SafeTask) {

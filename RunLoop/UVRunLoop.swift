@@ -59,6 +59,8 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     
     public var protected:Bool = false
     
+    private var appartment:Thread = Thread.current
+    
     private func newRelayData(relay:RunLoopType?) -> RelayData? {
         var data:RelayData?
         
@@ -76,6 +78,7 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     
     public var relay:RunLoopType? {
         didSet {
+            print("!!!!!!!!!!!!!!!!relay set ")
             let data = newRelayData(relay)
             let oldData = _relay.content
             _relay.content = data
@@ -115,6 +118,8 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
         //Yes, exactly. Fail in runtime if we can not create a loop
         self._loop = loop
         
+        var sendRelayRequest:(data:RelayData)->Void = {data in}
+        
         self._caller = try! Prepare(loop: _loop) { _ in
             while !personalQueue.content.isEmpty {
                 let task = personalQueue.content.removeFirst()
@@ -130,10 +135,19 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
                 let task = relayQueue.content.removeFirst()
                 task.task()
             }
+            
+            if let relayData = relay.content {
+                if !relayQueue.content.isEmpty {
+                    let data = relayData
+                    relay.content = data
+                    sendRelayRequest(data: data)
+                }
+            }
         }
         
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
+            print("!!!!relays: ", commonQueue.content)
             sema.wait()
             let urgents = commonQueue.content.filter { task in
                 task.urgent
@@ -147,6 +161,8 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
             personalQueue.content.insertContentsOf(urgents, at: commonQueue.content.startIndex)
             personalQueue.content.appendContentsOf(commons)
         }
+        
+        sendRelayRequest = self.sendRelayRequest
     }
     
     public convenience required init() {
@@ -186,10 +202,6 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
                 let task = self._relayQueue.content.removeFirst()
                 relay.relay.execute(task.task)
             }
-            
-            let data = RelayData(relay: relay.relay, signature: NSUUID())
-            self._relay.content = data
-            self.sendRelayRequest(data)
         }
         
         sema.wait()
@@ -214,7 +226,10 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     public func execute(relay:Bool, urgent:Bool, task: SafeTask) {
         let task = UVRunLoopTask(task: task, relay: relay, urgent: urgent)
         
-        if self.relay == nil && RunLoop.current.isEqualTo(self) {
+        //initialize autorelay
+        RunLoop.current
+        
+        if appartment == Thread.current {
             //here we are safe to be lock-less
             if urgent {
                 _personalQueue.content.insert(task, atIndex: _personalQueue.content.startIndex)
@@ -235,15 +250,8 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     
     public func execute(relay:Bool, delay:Timeout, task: SafeTask) {
         let endTime = delay.timeSinceNow()
-        execute {
+        executeNoRelay {
             let timeout = Timeout(until: endTime)
-            
-            if relay {
-                if let relay = self.relay {
-                    relay.execute(timeout, task: task)
-                    return
-                }
-            }
             
             switch timeout {
             case .Immediate:
@@ -255,11 +263,11 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
                         timer.close()
                     }
                     //it could have changed now when the timer fires
-                    if !relay || self.relay == nil {
-                        task()
-                    } else {
+//                    if !relay && self.relay == nil {
+//                        task()
+//                    } else {
                         self.execute(relay, task: task)
-                    }
+//                    }
                 }
                 //yes, this is a runtime error
                 try! timer.start(timeout)
@@ -275,15 +283,52 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        var finalizer:SafeTask? = {
+            //yes, fail if so. It's runtime error
+            try! self._caller.stop()
+        }
+        defer {
+            finalizer?()
+        }
+        
+        let appartment = self.appartment
+        self.appartment = Thread.current
+        defer {
+            self.appartment = appartment
+        }
+        
+//        if let appartment = self.appartment {
+            if !(appartment == self.appartment) {
+                let sema = BlockingSemaphore()
+                let relay = self.relay
+                let protected = self.protected
+                
+                finalizer = {
+                    self.relay = relay
+                    self.protected = protected
+                    sema.signal()
+                }
+                
+                self.relay = nil
+                self.protected = false
+                
+                let sema2 = BlockingSemaphore()
+                self.urgentNoRelay {
+                    sema2.signal()
+                    sema.wait()
+                }
+                print("before wait")
+                sema2.wait()
+                print("passed")
+            }
+//        }
+        
         defer {
             self._stop.content = false
         }
         //yes, fail if so. It's runtime error
         try! _caller.start()
-        defer {
-            //yes, fail if so. It's runtime error
-            try! _caller.stop()
-        }
+        //is stoppped in finalizer. See above
         
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
         var timedout:Bool = false
@@ -310,7 +355,7 @@ public class UVRunLoop : RunnableRunLoopType, RelayRunLoopType {
         if protected {
             return
         }
-        if relay != nil {
+        if appartment != Thread.current {
             self.executeNoRelay {
                 self._stop.content = true
                 self._loop.stop()
