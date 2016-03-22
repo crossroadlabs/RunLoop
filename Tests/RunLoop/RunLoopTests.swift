@@ -41,28 +41,29 @@ class RunLoopTests: XCTestCase {
     
     func testImmediateTimeout() {
         let expectation = self.expectationWithDescription("OK TIMER")
-        RunLoop.current.execute(.Immediate) {
+        let loop = RunLoop.current
+        loop.execute(.Immediate) {
             expectation.fulfill()
-            (RunLoop.current as? RunnableRunLoopType)?.stop()
+//            (loop as? RunnableRunLoopType)?.stop()
         }
-        (RunLoop.current as? RunnableRunLoopType)?.run()
+//        (loop as? RunnableRunLoopType)?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
     func testNested() {
-        let rl = RunLoop.current as? RunnableRunLoopType
+//        let rl = RunLoop.current as? RunnableRunLoopType
         let outer = self.expectationWithDescription("outer")
         let inner = self.expectationWithDescription("inner")
-        RunLoop.current.execute {
-            RunLoop.current.execute {
+        RunLoop.main.execute {
+            RunLoop.main.execute {
                 inner.fulfill()
-                rl?.stop()
+//                rl?.stop()
             }
-            rl?.run()
+//            rl?.run()
             outer.fulfill()
-            rl?.stop()
+//            rl?.stop()
         }
-        rl?.run()
+//        rl?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
@@ -161,6 +162,54 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
+    func testBasicRelay() {
+        let dispatchLoop = DispatchRunLoop()
+        let loop = UVRunLoop()
+        loop.relay = dispatchLoop
+        
+        let immediate = self.expectationWithDescription("immediate")
+        let timer = self.expectationWithDescription("timer")
+        
+        loop.execute {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate.fulfill()
+        }
+        
+        loop.execute(.In(timeout: 0.1)) {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            timer.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        loop.relay = nil
+        
+        let immediate2 = self.expectationWithDescription("immediate2")
+        loop.execute {
+            XCTAssertFalse(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate2.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
+    
+    func testAutorelay() {
+        let immediate = self.expectationWithDescription("immediate")
+        RunLoop.current.execute {
+            immediate.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        
+        let timer = self.expectationWithDescription("timer")
+        RunLoop.current.execute(Timeout(timeout: 0.1)) {
+            timer.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
 }
 
 #if os(Linux)
