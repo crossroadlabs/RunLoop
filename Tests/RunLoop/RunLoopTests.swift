@@ -210,6 +210,51 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
+    
+    func testStopUV() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        var counter = 0
+        rl.execute {
+            counter += 1
+            rl.stop()
+        }
+        rl.execute {
+            counter += 1
+            rl.stop()
+        }
+        
+        (RunLoop.current as? RunnableRunLoopType)?.run(.In(timeout: 1))
+        
+        XCTAssert(counter == 1)
+    }
+    
+    func testNestedUV() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        let lvl1 = self.expectationWithDescription("lvl1")
+        let lvl2 = self.expectationWithDescription("lvl2")
+        let lvl3 = self.expectationWithDescription("lvl3")
+        let lvl4 = self.expectationWithDescription("lvl4")
+        rl.execute {
+            rl.execute {
+                rl.execute {
+                    rl.execute {
+                        lvl4.fulfill()
+                        rl.stop()
+                    }
+                    rl.run()
+                    lvl3.fulfill()
+                    rl.stop()
+                }
+                rl.run()
+                lvl2.fulfill()
+                rl.stop()
+            }
+            rl.run()
+            lvl1.fulfill()
+            rl.stop()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
 }
 
 #if os(Linux)
