@@ -184,6 +184,8 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
                 requestRelay?()
             }
         }
+        //yes, fail with panic
+        try! self._caller.start() //stops in finalizer, see above
         
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
@@ -334,10 +336,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
-        var finalizer:SafeTask? = {
-            //yes, fail if so. It's runtime error
-            try! self._caller.stop()
-        }
+        var finalizer:SafeTask? = nil
         defer {
             finalizer?()
         }
@@ -382,8 +381,6 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         defer {
             self._stop.content = false
         }
-        //yes, fail if so. It's runtime error
-        try! _caller.start() //stops in finalizer, see above
         
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
         var timedout:Bool = false
