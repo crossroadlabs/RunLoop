@@ -134,7 +134,7 @@ func ==<T>(lhs:HashableAnyContainer<T>, rhs:HashableAnyContainer<T>) -> Bool {
 
 private enum Wakeable {
     case Loop(loop:RunnableRunLoopType)
-    case Sema(sema:SemaphoreType)
+    case Sema(loop:RunLoopType, sema:SemaphoreType)
 }
 
 private extension Wakeable {
@@ -142,7 +142,7 @@ private extension Wakeable {
         if let loop = loop as? RunnableRunLoopType {
             self = .Loop(loop: loop)
         } else {
-            self = .Sema(sema: loop.semaphore())
+            self = .Sema(loop:loop, sema: loop.semaphore())
         }
     }
     
@@ -154,7 +154,7 @@ private extension Wakeable {
             } else {
                 return loop.run()
             }
-        case .Sema(let sema):
+        case .Sema(_, let sema):
             if let until = until {
                 return sema.wait(until)
             } else {
@@ -170,17 +170,20 @@ private extension Wakeable {
                 task()
                 loop.stop()
             }
-        case .Sema(let sema):
-            task()
-            sema.signal()
+        case .Sema(let loop, let sema):
+            loop.execute {
+                task()
+                sema.signal()
+            }
         }
     }
 }
 
 public class RunLoopSemaphore : SemaphoreType {
-    private var signals:[HashableAnyContainer<SafeTask>]
+    private var signals:[SafeTask]
     private let lock:NSLock
     private var value:Int
+    private var signaled:ThreadLocal<Bool>
     
     public required convenience init() {
         self.init(value: 0)
@@ -190,6 +193,7 @@ public class RunLoopSemaphore : SemaphoreType {
         self.value = value
         signals = Array()
         lock = NSLock()
+        signaled = try! ThreadLocal()
     }
     
     //TODO: optimise with atomics for value. Will allow to run non-blocked sema faster
@@ -211,9 +215,9 @@ public class RunLoopSemaphore : SemaphoreType {
         let loop = RunLoop.current
         let wakeable:Wakeable = Wakeable(loop: loop)
         
-        let signal = HashableAnyContainer {
+        let signal = {
             wakeable.wake {
-                signaled = true
+                self.signaled.value = true
             }
         }
         
@@ -221,19 +225,15 @@ public class RunLoopSemaphore : SemaphoreType {
         
         if value < 0 {
             lock.unlock()
-            defer {
-                lock.lock()
-            }
+            //defer {
+            //    lock.lock()
+            //}
             while !signaled && !timedout {
                 timedout = wakeable.waitWithConditionalDate(until)
+                signaled = self.signaled.value ?? false
             }
-        }
-        
-        let index = signals.indexOf { element in
-            element == signal
-        }
-        if let index = index {
-            signals.removeAtIndex(index)
+            self.signaled.value = false
+            lock.lock()
         }
         
         return signaled
@@ -250,9 +250,9 @@ public class RunLoopSemaphore : SemaphoreType {
     public func signal() -> Int {
         lock.lock()
         value += 1
-        let signal:AnyContainer<SafeTask>? = signals.isEmpty ? nil : signals.removeFirst()
+        let signal:SafeTask? = signals.isEmpty ? nil : signals.removeLast()
         lock.unlock()
-        signal?.content()
+        signal?()
         return 1
     }
 }
