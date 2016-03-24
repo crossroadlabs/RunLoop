@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		65525C171C92D37D002733E2 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C161C92D37D002733E2 /* Sync.swift */; };
+		65525C191C92E880002733E2 /* Relay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C181C92E880002733E2 /* Relay.swift */; };
 		65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65538C371C8F36650080D0CA /* DispatchRunLoop.swift */; };
 		658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31341C8DA70D009CCC7A /* RunLoop.framework */; };
 		658C31441C8DA70D009CCC7A /* RunLoopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31431C8DA70D009CCC7A /* RunLoopTests.swift */; };
@@ -24,6 +25,9 @@
 		658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31691C8DB81C009CCC7A /* UVRunLoop.swift */; };
 		658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */; };
 		658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
+		922485541CA1B05000618C00 /* EquatableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922485531CA1B05000618C00 /* EquatableTests.swift */; };
+		9237002B1CA076F8000042BA /* SemaphoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9237002A1CA076F8000042BA /* SemaphoreTests.swift */; };
+		92A9EFF11CA069EE00A62F33 /* StressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A9EFF01CA069EE00A62F33 /* StressTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		65525C161C92D37D002733E2 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
+		65525C181C92E880002733E2 /* Relay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relay.swift; sourceTree = "<group>"; };
 		65538C371C8F36650080D0CA /* DispatchRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchRunLoop.swift; sourceTree = "<group>"; };
 		658C31341C8DA70D009CCC7A /* RunLoop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RunLoop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		658C31391C8DA70D009CCC7A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -70,6 +75,9 @@
 		658C31691C8DB81C009CCC7A /* UVRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UVRunLoop.swift; sourceTree = "<group>"; };
 		658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentRunLoop.swift; sourceTree = "<group>"; };
 		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
+		922485531CA1B05000618C00 /* EquatableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquatableTests.swift; sourceTree = "<group>"; };
+		9237002A1CA076F8000042BA /* SemaphoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SemaphoreTests.swift; sourceTree = "<group>"; };
+		92A9EFF01CA069EE00A62F33 /* StressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StressTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +131,7 @@
 				658C314E1C8DAA8D009CCC7A /* RunLoop.swift */,
 				658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */,
 				65525C161C92D37D002733E2 /* Sync.swift */,
+				65525C181C92E880002733E2 /* Relay.swift */,
 				658C31711C8DE57A009CCC7A /* Semaphore.swift */,
 				658C31691C8DB81C009CCC7A /* UVRunLoop.swift */,
 				65538C371C8F36650080D0CA /* DispatchRunLoop.swift */,
@@ -135,8 +144,12 @@
 			children = (
 				658C31431C8DA70D009CCC7A /* RunLoopTests.swift */,
 				658C31451C8DA70D009CCC7A /* Info.plist */,
+				92A9EFF01CA069EE00A62F33 /* StressTests.swift */,
+				9237002A1CA076F8000042BA /* SemaphoreTests.swift */,
+				922485531CA1B05000618C00 /* EquatableTests.swift */,
 			);
-			path = RunLoopTests;
+			name = RunLoopTests;
+			path = Tests/RunLoop;
 			sourceTree = "<group>";
 		};
 		658C31521C8DACCB009CCC7A /* Frameworks */ = {
@@ -273,6 +286,7 @@
 				65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */,
 				658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */,
 				658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */,
+				65525C191C92E880002733E2 /* Relay.swift in Sources */,
 				65525C171C92D37D002733E2 /* Sync.swift in Sources */,
 				658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */,
 			);
@@ -283,6 +297,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				658C31441C8DA70D009CCC7A /* RunLoopTests.swift in Sources */,
+				9237002B1CA076F8000042BA /* SemaphoreTests.swift in Sources */,
+				922485541CA1B05000618C00 /* EquatableTests.swift in Sources */,
+				92A9EFF11CA069EE00A62F33 /* StressTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +418,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -442,7 +460,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = RunLoopTests/Info.plist;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -457,7 +476,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = RunLoopTests/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -40,17 +40,15 @@ public protocol RunLoopType : NonStrictEquatable {
     static var main:RunLoopType {get}
 }
 
-public extension RunLoopType {
-    public func urgent(task:SafeTask) {
-        self.execute(task)
-    }
-}
-
 public protocol RunnableRunLoopType : RunLoopType {
     func run(timeout:Timeout, once:Bool) -> Bool
     func run(until:NSDate, once:Bool) -> Bool
     
     func stop()
+    
+    /// protected loop stop shout take to effect while this flag is set
+    /// false by default
+    var protected:Bool {get set}
 }
 
 public extension RunnableRunLoopType {

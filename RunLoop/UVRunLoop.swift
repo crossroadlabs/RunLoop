@@ -19,22 +19,75 @@ import Boilerplate
 import UV
 import CUV
 
+private func makeMain() -> RunLoopType {
+    // autorelay
+    #if !os(Linux) || dispatch
+        let main = dispatch_get_main_queue()
+        dispatch_async(main) {
+            if var loop = RunLoop.main as? RelayRunLoopType {
+                loop.relay = DispatchRunLoop.main
+                if var loop = loop as? RunnableRunLoopType {
+                    struct CleanupData {
+                        let thread:Thread
+                        let loop:RunnableRunLoopType
+                        
+                        init(thread:Thread, loop:RunnableRunLoopType) {
+                            self.thread = thread
+                            self.loop = loop
+                        }
+                    }
+                    func cleanup(context:UnsafeMutablePointer<Void>) {
+                        let data = Unmanaged<AnyContainer<CleanupData>>.fromOpaque(COpaquePointer(context)).takeRetainedValue()
+                        var loop = data.content.loop
+                        loop.protected = false
+                        loop.stop()
+                        try! data.content.thread.join()
+                    }
+                    
+                    let sema = BlockingSemaphore()
+                    loop.executeNoRelay {
+                        sema.signal()
+                    }
+                    
+                    //skip runtime error
+                    let thread = try! Thread {
+                        loop.protected = true
+                        loop.run()
+                        print("!@#$%^%$#@!@#$%^%$#@!@#$%^%$#@!@#$%")
+                    }
+                    
+                    sema.wait()
+                    
+                    let data = CleanupData(thread: thread, loop: loop)
+                    let arg = UnsafeMutablePointer<Void>(Unmanaged.passRetained(AnyContainer(data)).toOpaque())
+                    dispatch_set_context(main, arg);
+                    dispatch_set_finalizer_f(main, cleanup)
+                }
+            }
+        }
+    #endif
+    return UVRunLoop(loop: Loop.defaultLoop())
+}
+
 private struct UVRunLoopTask {
     let task: SafeTask
     let urgent:Bool
+    let relay:Bool
     
-    init(task: SafeTask, urgent:Bool) {
+    init(task: SafeTask, urgent:Bool, relay:Bool) {
         self.task = task
         self.urgent = urgent
+        self.relay = relay
     }
 }
 
 private let _currentLoopSignature = try! ThreadLocal<NSUUID>()
 
-public class UVRunLoop : RunnableRunLoopType, SettledType {
+public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     typealias Semaphore = BlockingSemaphore
     
     //wrapping as containers to avoid copying
+    private var _relayQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _personalQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _commonQueue:MutableAnyContainer<Array<UVRunLoopTask>>
     private var _stop:MutableAnyContainer<Bool>
@@ -43,6 +96,8 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     private let _wake:Async
     private let _caller:Prepare
     private let _semaphore:SemaphoreType
+    
+    public var protected:Bool = false
     
     private let _loopSignature:NSUUID = NSUUID()
     
@@ -56,13 +111,44 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         }
     }
     
-    private (set) public static var main:RunLoopType = UVRunLoop(loop: Loop.defaultLoop())
+    private var signature:NSUUID = NSUUID()
+    private func resign() {
+        self.signature = NSUUID()
+    }
+    
+    public var relay:RunLoopType? = nil {
+        didSet {
+            //I would love to add something to Optional, but it does not work. Stupid Swift
+            guard let lhs = oldValue else {
+                switch relay {
+                case .None:
+                    break
+                default:
+                    relayChanged()
+                }
+                return
+            }
+            
+            guard let rhs = relay else {
+                relayChanged()
+                return
+            }
+            
+            if !lhs.isEqualTo(rhs) {
+                relayChanged()
+            }
+        }
+    }
+    
+    public static let main:RunLoopType = makeMain()
     
     private init(loop:Loop) {
+        let relayQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let personalQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let commonQueue = MutableAnyContainer(Array<UVRunLoopTask>())
         let stop = MutableAnyContainer(false)
         
+        self._relayQueue = relayQueue
         self._personalQueue = personalQueue
         self._commonQueue = commonQueue
         self._stop = stop
@@ -73,15 +159,33 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         //Yes, exactly. Fail in runtime if we can not create a loop
         self._loop = loop
         
+        var requestRelay:SafeTask? = nil
+        var callRelayed:Optional<(UVRunLoopTask)->Void> = nil
+        var callTask:Optional<(UVRunLoopTask)->Void> = nil
+        
         self._caller = try! Prepare(loop: _loop) { _ in
+            var hadRelayed = false
             while !personalQueue.content.isEmpty {
                 let task = personalQueue.content.removeFirst()
-                task.task()
+                
+                if task.relay {
+                    callRelayed?(task)
+                    hadRelayed = true
+                } else {
+                    callTask?(task)
+                }
+                
                 if stop.content {
                     break
                 }
             }
+            
+            if hadRelayed {
+                requestRelay?()
+            }
         }
+        //yes, fail with panic
+        try! self._caller.start() //stops in finalizer, see above
         
         //same with async
         self._wake = try! Async(loop: _loop) { _ in
@@ -92,7 +196,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
             
             let urgents = commonQueue.content.filter { task in
                 task.urgent
-            }.reverse()
+            }
             let commons = commonQueue.content.filter { task in
                 !task.urgent
             }
@@ -101,6 +205,10 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
             personalQueue.content.insertContentsOf(urgents, at: commonQueue.content.startIndex)
             personalQueue.content.appendContentsOf(commons)
         }
+        
+        requestRelay = self.requestRelay
+        callRelayed = self.callRelayed
+        callTask = self.callTask
     }
     
     public convenience required init() {
@@ -113,11 +221,62 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     }
     
     public func semaphore() -> SemaphoreType {
-        return RunLoopSemaphore()
+        return relay.map{$0.semaphore()}.getOrElse(RunLoopSemaphore())
     }
     
     public func semaphore(value:Int) -> SemaphoreType {
-        return RunLoopSemaphore(value: value)
+        return relay.map{$0.semaphore(value)}.getOrElse(RunLoopSemaphore(value: value))
+    }
+    
+    private func relayChanged() {
+        self.urgentNoRelay {
+            self.resign()
+            
+            if self.relay == nil {
+                self._personalQueue.content.appendContentsOf(self._relayQueue.content)
+                self._relayQueue.content.removeAll()
+            } else {
+                self.requestRelay()
+            }
+        }
+    }
+    
+    private func callTask(task:UVRunLoopTask) {
+        if isHome {
+            task.task()
+        } else {
+            self.execute(task)
+        }
+    }
+    
+    private func callRelayed(task:UVRunLoopTask) -> Void {
+        if self.relay != nil {
+            _relayQueue.content.append(task)
+        } else {
+            callTask(task)
+        }
+    }
+    
+    private func requestRelay() {
+        if let relay = self.relay {
+            let signature = self.signature
+            relay.execute {
+                if signature != self.signature {
+                    return
+                }
+                let sema = relay.semaphore()
+                self.executeNoRelay {
+                    defer {
+                        sema.signal()
+                    }
+                    for task in self._relayQueue.content {
+                        relay.execute(task.task)
+                    }
+                    self._relayQueue.content.removeAll()
+                }
+                sema.wait()
+            }
+        }
     }
     
     private func execute(task:UVRunLoopTask) {
@@ -138,30 +297,30 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         }
     }
     
-    public func urgent(task: SafeTask) {
-        let task = UVRunLoopTask(task: task, urgent: true)
+    public func urgent(relay:Bool, task:SafeTask) {
+        let task = UVRunLoopTask(task: task, urgent: true, relay: relay)
         self.execute(task)
     }
     
-    public func execute(task:SafeTask) {
-        let task = UVRunLoopTask(task: task, urgent: false)
+    public func execute(relay:Bool, task: SafeTask) {
+        let task = UVRunLoopTask(task: task, urgent: false, relay: relay)
         self.execute(task)
     }
     
-    public func execute(delay:Timeout, task:SafeTask) {
+    public func execute(relay:Bool, delay:Timeout, task: SafeTask) {
         let endTime = delay.timeSinceNow()
-        execute {
+        executeNoRelay {
             let timeout = Timeout(until: endTime)
             switch timeout {
             case .Immediate:
-                self.execute(task)
+                self.urgent(relay, task: task)
             default:
                 //yes, this is a runtime error
                 let timer = try! Timer(loop: self._loop) { timer in
                     defer {
                         timer.close()
                     }
-                    task()
+                    self.urgent(relay, task: task)
                 }
                 //yes, this is a runtime error
                 try! timer.start(timeout)
@@ -177,6 +336,36 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     
     /// returns true if timed out, false otherwise
     public func run(until:NSDate, once:Bool) -> Bool {
+        var finalizer:SafeTask? = nil
+        defer {
+            finalizer?()
+        }
+        
+        if !isHome && isRunning {
+            let sema = BlockingSemaphore()
+            let relay = self.relay
+            let protected = self.protected
+            
+            finalizer = {
+                self.relay = relay
+                self.protected = protected
+                sema.signal()
+            }
+            
+            self.relay = nil
+            self.protected = false
+            
+            let sema2 = BlockingSemaphore()
+            self.urgentNoRelay {
+                sema2.signal()
+                sema.wait()
+            }
+            print("before wait")
+            sema2.wait()
+            print("passed")
+        }
+        
+
         let currentLoopSignature = _currentLoopSignature.value
         defer {
             _currentLoopSignature.value = currentLoopSignature
@@ -191,12 +380,6 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
         
         defer {
             self._stop.content = false
-        }
-        //yes, fail if so. It's runtime error
-        try! _caller.start()
-        defer {
-            //yes, fail if so. It's runtime error
-            try! _caller.stop()
         }
         
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
@@ -221,8 +404,20 @@ public class UVRunLoop : RunnableRunLoopType, SettledType {
     }
     
     public func stop() {
-        self._stop.content = true
-        _loop.stop()
+        //protected loops can not stop
+        if protected {
+            return
+        }
+        
+        if isHome {
+            self._stop.content = true
+            _loop.stop()
+        } else {
+            self.executeNoRelay {
+                self._stop.content = true
+                self._loop.stop()
+            }
+        }
     }
     
     public func isEqualTo(other: NonStrictEquatable) -> Bool {

@@ -13,16 +13,6 @@ import Boilerplate
 
 class RunLoopTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
     func testExample() {
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
@@ -51,63 +41,30 @@ class RunLoopTests: XCTestCase {
     
     func testImmediateTimeout() {
         let expectation = self.expectationWithDescription("OK TIMER")
-        RunLoop.current.execute(.Immediate) {
+        let loop = RunLoop.current
+        loop.execute(.Immediate) {
             expectation.fulfill()
-            (RunLoop.current as? RunnableRunLoopType)?.stop()
+//            (loop as? RunnableRunLoopType)?.stop()
         }
-        (RunLoop.current as? RunnableRunLoopType)?.run()
+//        (loop as? RunnableRunLoopType)?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
     }
     
     func testNested() {
-        let rl = RunLoop.current as? RunnableRunLoopType
+//        let rl = RunLoop.current as? RunnableRunLoopType
         let outer = self.expectationWithDescription("outer")
         let inner = self.expectationWithDescription("inner")
-        RunLoop.current.execute {
-            RunLoop.current.execute {
+        RunLoop.main.execute {
+            RunLoop.main.execute {
                 inner.fulfill()
-                rl?.stop()
+//                rl?.stop()
             }
-            rl?.run()
+//            rl?.run()
             outer.fulfill()
-            rl?.stop()
+//            rl?.stop()
         }
-        rl?.run()
+//        rl?.run()
         self.waitForExpectationsWithTimeout(2, handler: nil)
-    }
-    
-    func stressSemaphore<Semaphore: SemaphoreType>(type:Semaphore.Type) {
-        let id = NSUUID().UUIDString
-        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
-        let sema = Semaphore(value: 1)
-        
-        for i in 0...1000 {
-            let expectation = self.expectationWithDescription("expectation \(i)")
-            dispatch_async(queue) {
-                sema.wait()
-                expectation.fulfill()
-                sema.signal()
-            }
-        }
-        
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
-    }
-    
-    func testSemaphoreStress() {
-        stressSemaphore(RunLoopSemaphore)
-        stressSemaphore(BlockingSemaphore)
-    }
-    
-    func testSemaphoreExternal() {
-        let loop = UVRunLoop()
-        let sema = loop.semaphore()
-        let dispatchLoop = DispatchRunLoop()
-        
-        dispatchLoop.execute {
-            sema.signal()
-        }
-        
-        XCTAssert(sema.wait(.In(timeout: 1)))
     }
     
     enum TestError : ErrorType {
@@ -205,11 +162,114 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+    func testBasicRelay() {
+        let dispatchLoop = DispatchRunLoop()
+        let loop = UVRunLoop()
+        loop.relay = dispatchLoop
+        
+        let immediate = self.expectationWithDescription("immediate")
+        let timer = self.expectationWithDescription("timer")
+        
+        loop.execute {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate.fulfill()
         }
+        
+        loop.execute(.In(timeout: 0.1)) {
+            XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
+            timer.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        loop.relay = nil
+        
+        let immediate2 = self.expectationWithDescription("immediate2")
+        loop.execute {
+            XCTAssertFalse(dispatchLoop.isEqualTo(RunLoop.current))
+            immediate2.fulfill()
+            loop.stop()
+        }
+        
+        loop.run()
+        
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
     }
     
+    func testAutorelay() {
+        let immediate = self.expectationWithDescription("immediate")
+        RunLoop.current.execute {
+            immediate.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        
+        let timer = self.expectationWithDescription("timer")
+        RunLoop.current.execute(Timeout(timeout: 0.1)) {
+            timer.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
+    
+    func testStopUV() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        var counter = 0
+        rl.execute {
+            counter += 1
+            rl.stop()
+        }
+        rl.execute {
+            counter += 1
+            rl.stop()
+        }
+        
+        (RunLoop.current as? RunnableRunLoopType)?.run(.In(timeout: 1))
+        
+        XCTAssert(counter == 1)
+    }
+    
+    func testNestedUV() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        let lvl1 = self.expectationWithDescription("lvl1")
+        let lvl2 = self.expectationWithDescription("lvl2")
+        let lvl3 = self.expectationWithDescription("lvl3")
+        let lvl4 = self.expectationWithDescription("lvl4")
+        rl.execute {
+            rl.execute {
+                rl.execute {
+                    rl.execute {
+                        lvl4.fulfill()
+                        rl.stop()
+                    }
+                    rl.run()
+                    lvl3.fulfill()
+                    rl.stop()
+                }
+                rl.run()
+                lvl2.fulfill()
+                rl.stop()
+            }
+            rl.run()
+            lvl1.fulfill()
+            rl.stop()
+        }
+        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+    }
 }
+
+#if os(Linux)
+extension RunLoopTests : XCTestCaseProvider {
+	var allTests : [(String, () throws -> Void)] {
+		return [
+			("testExample", testExample),
+			("testImmediateTimeout", testImmediateTimeout),
+			("testNested", testNested),
+			("testSemaphoreStress", testSemaphoreStress),
+			("testSemaphoreExternal", testSemaphoreExternal),
+			("testSyncToDispatch", testSyncToDispatch),
+			("testSyncToRunLoop", testSyncToRunLoop),
+			("testUrgent", testUrgent),
+		]
+	}
+}
+#endif
