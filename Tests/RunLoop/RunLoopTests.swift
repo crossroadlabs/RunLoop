@@ -14,7 +14,7 @@ import Boilerplate
 class RunLoopTests: XCTestCase {
     
     func testExample() {
-        let id = NSUUID().UUIDString
+        let id = NSUUID().uuidString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         
         var counter = 0
@@ -40,20 +40,20 @@ class RunLoopTests: XCTestCase {
     }
     
     func testImmediateTimeout() {
-        let expectation = self.expectationWithDescription("OK TIMER")
+        let expectation = self.expectation(withDescription: "OK TIMER")
         let loop = RunLoop.current
         loop.execute(.Immediate) {
             expectation.fulfill()
 //            (loop as? RunnableRunLoopType)?.stop()
         }
 //        (loop as? RunnableRunLoopType)?.run()
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
     func testNested() {
 //        let rl = RunLoop.current as? RunnableRunLoopType
-        let outer = self.expectationWithDescription("outer")
-        let inner = self.expectationWithDescription("inner")
+        let outer = self.expectation(withDescription: "outer")
+        let inner = self.expectation(withDescription: "inner")
         RunLoop.main.execute {
             RunLoop.main.execute {
                 inner.fulfill()
@@ -64,10 +64,10 @@ class RunLoopTests: XCTestCase {
 //            rl?.stop()
         }
 //        rl?.run()
-        self.waitForExpectationsWithTimeout(2, handler: nil)
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
-    enum TestError : ErrorType {
+    enum TestError : ErrorProtocol {
         case E1
         case E2
     }
@@ -81,7 +81,7 @@ class RunLoopTests: XCTestCase {
         
         XCTAssertEqual(result, "result")
         
-        let fail = self.expectationWithDescription("failed")
+        let fail = self.expectation(withDescription: "failed")
         
         do {
             try dispatchLoop.sync {
@@ -95,7 +95,7 @@ class RunLoopTests: XCTestCase {
             XCTFail("shoud not reach this")
         }
         
-        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+        self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
     
     func testSyncToRunLoop() {
@@ -116,7 +116,7 @@ class RunLoopTests: XCTestCase {
         
         XCTAssertEqual(result, "result")
         
-        let fail = self.expectationWithDescription("failed")
+        let fail = self.expectation(withDescription: "failed")
         
         do {
             try loop.sync {
@@ -135,7 +135,7 @@ class RunLoopTests: XCTestCase {
         
         try! thread.join()
         
-        self.waitForExpectationsWithTimeout(0.1, handler: nil)
+        self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
     
     func testUrgent() {
@@ -143,14 +143,14 @@ class RunLoopTests: XCTestCase {
         
         var counter = 1
         
-        let execute = self.expectationWithDescription("execute")
+        let execute = self.expectation(withDescription: "execute")
         loop.execute {
             XCTAssertEqual(2, counter)
             execute.fulfill()
             loop.stop()
         }
         
-        let urgent = self.expectationWithDescription("urgent")
+        let urgent = self.expectation(withDescription: "urgent")
         loop.urgent {
             XCTAssertEqual(1, counter)
             counter += 1
@@ -159,7 +159,7 @@ class RunLoopTests: XCTestCase {
         
         loop.run()
         
-        self.waitForExpectationsWithTimeout(1, handler: nil)
+        self.waitForExpectations(withTimeout: 1, handler: nil)
     }
     
     func testBasicRelay() {
@@ -167,8 +167,8 @@ class RunLoopTests: XCTestCase {
         let loop = UVRunLoop()
         loop.relay = dispatchLoop
         
-        let immediate = self.expectationWithDescription("immediate")
-        let timer = self.expectationWithDescription("timer")
+        let immediate = self.expectation(withDescription: "immediate")
+        let timer = self.expectation(withDescription: "timer")
         
         loop.execute {
             XCTAssert(dispatchLoop.isEqualTo(RunLoop.current))
@@ -185,7 +185,7 @@ class RunLoopTests: XCTestCase {
         
         loop.relay = nil
         
-        let immediate2 = self.expectationWithDescription("immediate2")
+        let immediate2 = self.expectation(withDescription: "immediate2")
         loop.execute {
             XCTAssertFalse(dispatchLoop.isEqualTo(RunLoop.current))
             immediate2.fulfill()
@@ -194,21 +194,21 @@ class RunLoopTests: XCTestCase {
         
         loop.run()
         
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
     
     func testAutorelay() {
-        let immediate = self.expectationWithDescription("immediate")
+        let immediate = self.expectation(withDescription: "immediate")
         RunLoop.current.execute {
             immediate.fulfill()
         }
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 0.2, handler: nil)
         
-        let timer = self.expectationWithDescription("timer")
+        let timer = self.expectation(withDescription: "timer")
         RunLoop.current.execute(Timeout(timeout: 0.1)) {
             timer.fulfill()
         }
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
     
     func testStopUV() {
@@ -230,10 +230,10 @@ class RunLoopTests: XCTestCase {
     
     func testNestedUV() {
         let rl = threadWithRunLoop(UVRunLoop).loop
-        let lvl1 = self.expectationWithDescription("lvl1")
-        let lvl2 = self.expectationWithDescription("lvl2")
-        let lvl3 = self.expectationWithDescription("lvl3")
-        let lvl4 = self.expectationWithDescription("lvl4")
+        let lvl1 = self.expectation(withDescription: "lvl1")
+        let lvl2 = self.expectation(withDescription: "lvl2")
+        let lvl3 = self.expectation(withDescription: "lvl3")
+        let lvl4 = self.expectation(withDescription: "lvl4")
         rl.execute {
             rl.execute {
                 rl.execute {
@@ -253,7 +253,7 @@ class RunLoopTests: XCTestCase {
             lvl1.fulfill()
             rl.stop()
         }
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
 }
 
