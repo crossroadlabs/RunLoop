@@ -1,7 +1,10 @@
 import XCTest
 
-@testable import RunLooptest
+@testable import RunLoopTestSuite
 
 XCTMain([
-	RunLoopTests(),
+	testCase(EquatableTests.allTests),
+	testCase(RunLoopTests.allTests),
+	testCase(SemaphoreTests.allTests),
+	testCase(StressTests.allTests),
 ])

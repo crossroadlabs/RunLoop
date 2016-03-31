@@ -13,7 +13,7 @@ import Boilerplate
 
 class RunLoopTests: XCTestCase {
     
-    func testExample() {
+    func testExecute() {
         let id = NSUUID().UUIDString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         
@@ -258,17 +258,19 @@ class RunLoopTests: XCTestCase {
 }
 
 #if os(Linux)
-extension RunLoopTests : XCTestCaseProvider {
-	var allTests : [(String, () throws -> Void)] {
+extension RunLoopTests {
+	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
 		return [
 			("testExample", testExample),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
-			("testSemaphoreStress", testSemaphoreStress),
-			("testSemaphoreExternal", testSemaphoreExternal),
 			("testSyncToDispatch", testSyncToDispatch),
 			("testSyncToRunLoop", testSyncToRunLoop),
 			("testUrgent", testUrgent),
+			("testBasicRelay", testBasicRelay),
+			("testAutorelay", testAutorelay),
+			("testStopUV", testStopUV),
+			("testNestedUV", testNestedUV),
 		]
 	}
 }

@@ -33,3 +33,17 @@ class EquatableTests : XCTestCase {
     }
     #endif
 }
+
+#if os(Linux)
+extension EquatableTests {
+	static var allTests : [(String, EquatableTests -> () throws -> Void)] {
+        var tests:[(String, EquatableTests -> () throws -> Void)] = [
+            ("testUVEquatable", testUVEquatable),
+        ]
+        #if dispatch
+            tests.append(("testDispatchEquatable", testDispatchEquatable))
+        #endif
+		return tests
+	}
+}
+#endif

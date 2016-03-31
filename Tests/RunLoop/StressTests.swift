@@ -96,3 +96,13 @@ class StressTests: XCTestCase {
     }
     #endif
 }
+
+#if os(Linux)
+extension StressTests {
+	static var allTests : [(String, StressTests -> () throws -> Void)] {
+		return [
+			("testStressUV", testStressUV),
+		]
+	}
+}
+#endif
