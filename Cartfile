@@ -1,2 +1,2 @@
 github "crossroadlabs/UV" "develop"
-github "crossroadlabs/Foundation3" "master"
+github "crossroadlabs/Foundation3" ~> 0.1
