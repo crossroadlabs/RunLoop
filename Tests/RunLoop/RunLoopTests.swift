@@ -8,36 +8,51 @@
 
 import XCTest
 import Boilerplate
+import Foundation3
+
+#if !os(tvOS)
+    import XCTest3
+#endif
 
 @testable import RunLoop
 
 class RunLoopTests: XCTestCase {
-
+    
     func testExecute() {
-        let id = NSUUID().UUIDString
-
-        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
-        
         var counter = 0
+        
+        let task = {
+            RunLoop.main.execute {
+                print("lalala:", counter)
+                counter += 1
+            }
+        }
+        var loops = [RunLoopType]()
+        
+        for _ in 0..<3 {
+            let thAndLoop = threadWithRunLoop(UVRunLoop)
+            loops.append(thAndLoop.loop)
+        }
+        for i in 0..<1000 {
+            loops[i % loops.count].execute(task)
+        }
+        
+        defer {
+            for l in loops {
+                if let rl = l as? RunnableRunLoopType {
+                    rl.stop()
+                }
+            }
+        }
+        
         
         RunLoop.main.execute(.In(timeout: 0.1)) {
             (RunLoop.current as? RunnableRunLoopType)?.stop()
             print("The End")
         }
         
-        for _ in 0...1000 {
-            dispatch_async(queue) {
-                RunLoop.main.execute {
-                    print("lalala:", counter)
-                    counter += 1
-                }
-            }
-        }
-        
         let main = (RunLoop.main as? RunnableRunLoopType)
         main?.run()
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
     func testImmediateTimeout() {
