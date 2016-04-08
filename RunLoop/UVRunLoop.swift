@@ -37,7 +37,7 @@ private func makeMain() -> RunLoopType {
                         }
                     }
                     func cleanup(context:UnsafeMutablePointer<Void>) {
-                        let data = Unmanaged<AnyContainer<CleanupData>>.fromOpaque(COpaquePointer(context)).takeRetainedValue()
+                        let data = Unmanaged<AnyContainer<CleanupData>>.fromOpaque(OpaquePointer(context)).takeRetainedValue()
                         var loop = data.content.loop
                         loop.protected = false
                         loop.stop()
@@ -59,7 +59,7 @@ private func makeMain() -> RunLoopType {
                     sema.wait()
                     
                     let data = CleanupData(thread: thread, loop: loop)
-                    let arg = UnsafeMutablePointer<Void>(Unmanaged.passRetained(AnyContainer(data)).toOpaque())
+                    let arg = UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: Unmanaged.passRetained(AnyContainer(data))))
                     dispatch_set_context(main, arg);
                     dispatch_set_finalizer_f(main, cleanup)
                 }
@@ -120,10 +120,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         didSet {
             //I would love to add something to Optional, but it does not work. Stupid Swift
             guard let lhs = oldValue else {
-                switch relay {
-                case .None:
-                    break
-                default:
+                if let _ = relay {
                     relayChanged()
                 }
                 return
@@ -202,8 +199,8 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
             }
             commonQueue.content.removeAll()
             
-            personalQueue.content.insertContentsOf(urgents, at: commonQueue.content.startIndex)
-            personalQueue.content.appendContentsOf(commons)
+            personalQueue.content.insert(contentsOf: urgents, at: commonQueue.content.startIndex)
+            personalQueue.content.append(contentsOf: commons)
         }
         
         requestRelay = self.requestRelay
@@ -233,7 +230,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
             self.resign()
             
             if self.relay == nil {
-                self._personalQueue.content.appendContentsOf(self._relayQueue.content)
+                self._personalQueue.content.append(contentsOf: self._relayQueue.content)
                 self._relayQueue.content.removeAll()
             } else {
                 self.requestRelay()
@@ -283,7 +280,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         if isHome {
             //here we are safe to be lock-less
             if task.urgent {
-                _personalQueue.content.insert(task, atIndex: _personalQueue.content.startIndex)
+                _personalQueue.content.insert(task, at: _personalQueue.content.startIndex)
             } else {
                 _personalQueue.content.append(task)
             }

@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import XCTest3
+import Foundation3
 import Boilerplate
 
 @testable import RunLoop
@@ -44,12 +46,12 @@ class SemaphoreTests : XCTestCase {
     
     #if !os(Linux) || dispatch
     func stressSemaphoreDispatch<Semaphore: SemaphoreType>(type:Semaphore.Type) {
-        let id = NSUUID().UUIDString
+        let id = NSUUID().uuidString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
         let sema = Semaphore(value: 1)
         
         for i in 0..<taskCount {
-            let expectation = self.expectationWithDescription("expectation \(i)")
+            let expectation = self.expectation(withDescription: "expectation \(i)")
             dispatch_async(queue) {
                 sema.wait()
                 expectation.fulfill()
@@ -57,7 +59,7 @@ class SemaphoreTests : XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
     
     func testLoopSemaphoreStressDispatch() {
@@ -92,7 +94,7 @@ class SemaphoreTests : XCTestCase {
             loops.append(thAndLoop.loop)
         }
         for i in 0..<taskCount {
-            let expectation = self.expectationWithDescription("expectation \(i)")
+            let expectation = self.expectation(withDescription: "expectation \(i)")
             loops[(i % loopCount)].execute {
                 sema.wait()
                 expectation.fulfill()
@@ -106,7 +108,7 @@ class SemaphoreTests : XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(1, handler: nil)
+        self.waitForExpectations(withTimeout: 1, handler: nil)
     }
     
     func testLoopSemaphoreStressUV() {

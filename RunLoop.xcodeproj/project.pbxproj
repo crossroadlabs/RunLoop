@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		653D515B1CA54B87007276AE /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; };
+		653D515C1CA54B8E007276AE /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; };
+		653D515D1CA54B91007276AE /* XCTest3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		653DBDB31CA47514001A3D36 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		653DBDB41CA4753B001A3D36 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; };
+		653DBDB51CA47543001A3D36 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; };
 		65525C171C92D37D002733E2 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C161C92D37D002733E2 /* Sync.swift */; };
 		65525C191C92E880002733E2 /* Relay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C181C92E880002733E2 /* Relay.swift */; };
 		65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65538C371C8F36650080D0CA /* DispatchRunLoop.swift */; };
@@ -47,6 +53,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				653D515D1CA54B91007276AE /* XCTest3.framework in Copy Frameworks */,
+				653DBDB31CA47514001A3D36 /* Foundation3.framework in Copy Frameworks */,
 				658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */,
 				658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */,
 				658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */,
@@ -57,6 +65,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		653D515A1CA54B87007276AE /* XCTest3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest3.framework; sourceTree = "<group>"; };
+		653DBDB21CA47514001A3D36 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		65525C161C92D37D002733E2 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		65525C181C92E880002733E2 /* Relay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relay.swift; sourceTree = "<group>"; };
 		65538C371C8F36650080D0CA /* DispatchRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchRunLoop.swift; sourceTree = "<group>"; };
@@ -85,6 +95,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				653DBDB51CA47543001A3D36 /* Foundation3.framework in Frameworks */,
+				653D515B1CA54B87007276AE /* XCTest3.framework in Frameworks */,
 				658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */,
 				658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */,
 				658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */,
@@ -95,7 +107,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				653D515C1CA54B8E007276AE /* XCTest3.framework in Frameworks */,
 				658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */,
+				653DBDB41CA4753B001A3D36 /* Foundation3.framework in Frameworks */,
 				658C31601C8DACED009CCC7A /* Boilerplate.framework in Frameworks */,
 				658C31611C8DACED009CCC7A /* Result.framework in Frameworks */,
 				658C31621C8DACED009CCC7A /* UV.framework in Frameworks */,
@@ -164,6 +178,8 @@
 		658C31531C8DACCB009CCC7A /* Mac */ = {
 			isa = PBXGroup;
 			children = (
+				653D515A1CA54B87007276AE /* XCTest3.framework */,
+				653DBDB21CA47514001A3D36 /* Foundation3.framework */,
 				658C31541C8DACCB009CCC7A /* Boilerplate.framework */,
 				658C31551C8DACCB009CCC7A /* Boilerplate.framework.dSYM */,
 				658C31561C8DACCB009CCC7A /* Result.framework */,

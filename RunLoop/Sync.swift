@@ -48,9 +48,9 @@ public extension RunLoopType {
         }()
     }
     
-    public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
+    /*public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
         return try syncThroughAsync2(task)
-    }
+    }*/
     
     public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
         return try syncThroughAsync2(task)

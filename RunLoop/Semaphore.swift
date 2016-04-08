@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+import Foundation3
 import Boilerplate
 
 public protocol SemaphoreType {
@@ -56,7 +57,7 @@ private extension NSCondition {
             self.wait()
             return true
         }
-        return self.waitUntilDate(date)
+        return self.wait(until: date)
     }
 }
 

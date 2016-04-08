@@ -16,6 +16,7 @@
 
 #if !os(Linux) || dispatch
     import Foundation
+    import Foundation3
     import Dispatch
     
     import Boilerplate
@@ -59,7 +60,7 @@
         }
         
         public required convenience init() {
-            let name = NSUUID().UUIDString
+            let name = NSUUID().uuidString
             let queue = dispatch_queue_create(name, nil)
             self.init(queue: queue)
         }
@@ -108,9 +109,9 @@
             }()
         }
         
-        public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
+        /*public func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType {
             return try dispatchSync(task)
-        }
+        }*/
         
         public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
             return try dispatchSync(task)
