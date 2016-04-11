@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		653D515B1CA54B87007276AE /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; };
 		653D515C1CA54B8E007276AE /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; };
 		653D515D1CA54B91007276AE /* XCTest3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		653DBDB31CA47514001A3D36 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -96,7 +95,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				653DBDB51CA47543001A3D36 /* Foundation3.framework in Frameworks */,
-				653D515B1CA54B87007276AE /* XCTest3.framework in Frameworks */,
 				658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */,
 				658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */,
 				658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */,
