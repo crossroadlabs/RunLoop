@@ -20,8 +20,8 @@ let package = Package(
     name: "RunLoop",
     targets: [Target(name: "RunLoop")],
     dependencies: [
-        .Package(url: "https://github.com/crossroadlabs/UV.git", majorVersion: 0),
-        .Package(url: "https://github.com/crossroadlabs/Foundation3.git", majorVersion: 0),
-        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0)
+        .Package(url: "https://github.com/crossroadlabs/UV.git", majorVersion: 0, minor: 1),
+        .Package(url: "https://github.com/crossroadlabs/Foundation3.git", majorVersion: 0, minor: 1),
+        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0, minor: 1)
     ]
 )
