@@ -18,6 +18,7 @@ import Foundation3
 
 class RunLoopTests: XCTestCase {
     
+    #if !nouv
     func testExecute() {
         var counter = 0
         
@@ -54,6 +55,7 @@ class RunLoopTests: XCTestCase {
         let main = (RunLoop.main as? RunnableRunLoopType)
         main?.run()
     }
+    #endif
     
     func testImmediateTimeout() {
         let expectation = self.expectation(withDescription: "OK TIMER")
@@ -88,6 +90,7 @@ class RunLoopTests: XCTestCase {
         case E2
     }
     
+    #if !os(Linux) || dispatch
     func testSyncToDispatch() {
         let dispatchLoop = DispatchRunLoop()
         
@@ -113,6 +116,7 @@ class RunLoopTests: XCTestCase {
         
         self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
+    #endif
     
     func testSyncToRunLoop() {
         let sema = RunLoop.current.semaphore()
@@ -154,6 +158,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
     
+    #if !nouv
     func testUrgent() {
         let loop = UVRunLoop()
         
@@ -271,6 +276,7 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    #endif
 }
 
 #if os(Linux)

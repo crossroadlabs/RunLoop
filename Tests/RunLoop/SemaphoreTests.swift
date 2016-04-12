@@ -70,6 +70,7 @@ class SemaphoreTests : XCTestCase {
         stressSemaphoreDispatch(BlockingSemaphore)
     }
     
+    #if !nouv
     func testSemaphoreExternal() {
         let loop = UVRunLoop()
         let sema = loop.semaphore()
@@ -81,9 +82,11 @@ class SemaphoreTests : XCTestCase {
         
         XCTAssert(sema.wait(.In(timeout: 1)))
     }
+    #endif
     
     #endif
     
+    #if !nouv
     func stressSemaphoreUV<Semaphore: SemaphoreType>(type: Semaphore.Type) {
         let loopCount = 10
         var loops:[UVRunLoop] = []
@@ -118,6 +121,8 @@ class SemaphoreTests : XCTestCase {
     func testBlockingSemaphoreUV() {
         stressSemaphoreUV(BlockingSemaphore)
     }
+    
+    #endif
 }
 
 #if os(Linux)

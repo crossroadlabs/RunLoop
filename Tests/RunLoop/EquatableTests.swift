@@ -12,7 +12,7 @@ import Boilerplate
 @testable import RunLoop
 
 class EquatableTests : XCTestCase {
-    
+    #if !nouv
     func testUVEquatable() {
         let loop1 = UVRunLoop()
         let loop2 = UVRunLoop()
@@ -21,6 +21,7 @@ class EquatableTests : XCTestCase {
         XCTAssert(loop1 == loop1)
         XCTAssert(loop2 == loop2)
     }
+    #endif
     
     #if !os(Linux) || dispatch
     func testDispatchEquatable() {
