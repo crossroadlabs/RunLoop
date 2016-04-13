@@ -1,4 +1,4 @@
-//===--- LinuxMain.swift -------------------------------------------------===//
+//===--- Package.swift ----------------------------------------------------===//
 //Copyright (c) 2016 Daniel Leping (dileping)
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +14,14 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
-import XCTest
+import PackageDescription
 
-@testable import RunLoopTestSuite
-
-XCTMain([
-	testCase(EquatableTests.allTests),
-	testCase(RunLoopTests.allTests),
-	testCase(SemaphoreTests.allTests),
-	testCase(StressTests.allTests),
-])
+let package = Package(
+    name: "RunLoop",
+    targets: [Target(name: "RunLoop")],
+    dependencies: [
+        .Package(url: "https://github.com/crossroadlabs/UV.git", majorVersion: 0, minor: 1),
+        .Package(url: "https://github.com/crossroadlabs/Foundation3.git", majorVersion: 0, minor: 1),
+        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0, minor: 1)
+    ]
+)

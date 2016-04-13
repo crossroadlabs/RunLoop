@@ -30,6 +30,7 @@ class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
     
+    #if !nouv
     func testStressUV() {
         let lock = NSLock()
         var counter = 0
@@ -65,6 +66,7 @@ class StressTests: XCTestCase {
         
         XCTAssert(counter == threadCount*taskCount, "Timeout")
     }
+    #endif
     
     #if !os(Linux) || dispatch
     func testStressDispatch() {
@@ -96,3 +98,13 @@ class StressTests: XCTestCase {
     }
     #endif
 }
+
+#if os(Linux)
+extension StressTests {
+	static var allTests : [(String, StressTests -> () throws -> Void)] {
+		return [
+			("testStressUV", testStressUV),
+		]
+	}
+}
+#endif

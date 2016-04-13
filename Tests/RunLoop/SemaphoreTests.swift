@@ -44,6 +44,7 @@ class SemaphoreTests : XCTestCase {
         XCTAssert(sema.wait(.In(timeout: 2)))
     }
     
+    #if !os(Linux) || dispatch
     func stressSemaphoreDispatch<Semaphore: SemaphoreType>(type:Semaphore.Type) {
         let id = NSUUID().uuidString
         let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
@@ -69,6 +70,23 @@ class SemaphoreTests : XCTestCase {
         stressSemaphoreDispatch(BlockingSemaphore)
     }
     
+    #if !nouv
+    func testSemaphoreExternal() {
+        let loop = UVRunLoop()
+        let sema = loop.semaphore()
+        let dispatchLoop = DispatchRunLoop()
+        
+        dispatchLoop.execute {
+            sema.signal()
+        }
+        
+        XCTAssert(sema.wait(.In(timeout: 1)))
+    }
+    #endif
+    
+    #endif
+    
+    #if !nouv
     func stressSemaphoreUV<Semaphore: SemaphoreType>(type: Semaphore.Type) {
         let loopCount = 10
         var loops:[UVRunLoop] = []
@@ -104,17 +122,21 @@ class SemaphoreTests : XCTestCase {
         stressSemaphoreUV(BlockingSemaphore)
     }
     
-    func testSemaphoreExternal() {
-        let loop = UVRunLoop()
-        let sema = loop.semaphore()
-        let dispatchLoop = DispatchRunLoop()
-        
-        dispatchLoop.execute {
-            sema.signal()
-        }
-        
-        XCTAssert(sema.wait(.In(timeout: 1)))
-    }
-    
-    
+    #endif
 }
+
+#if os(Linux)
+extension SemaphoreTests {
+	static var allTests : [(String, SemaphoreTests -> () throws -> Void)] {
+		return [
+			("testBlockingSemaphoreTimeout", testBlockingSemaphoreTimeout),
+			("testBlockingSemaphoreManySignalTimeout", testBlockingSemaphoreManySignalTimeout),
+			("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch),
+			("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch),
+			("testLoopSemaphoreStressUV", testLoopSemaphoreStressUV),
+			("testBlockingSemaphoreUV", testBlockingSemaphoreUV),
+			("testSemaphoreExternal", testSemaphoreExternal),
+		]
+	}
+}
+#endif

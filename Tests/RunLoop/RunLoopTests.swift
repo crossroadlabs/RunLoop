@@ -8,36 +8,54 @@
 
 import XCTest
 import Boilerplate
+import Foundation3
+
+#if !os(tvOS)
+    import XCTest3
+#endif
 
 @testable import RunLoop
 
 class RunLoopTests: XCTestCase {
     
-    func testExample() {
-        let id = NSUUID().uuidString
-        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
-        
+    #if !nouv
+    func testExecute() {
         var counter = 0
+        
+        let task = {
+            RunLoop.main.execute {
+                print("lalala:", counter)
+                counter += 1
+            }
+        }
+        var loops = [RunLoopType]()
+        
+        for _ in 0..<3 {
+            let thAndLoop = threadWithRunLoop(UVRunLoop)
+            loops.append(thAndLoop.loop)
+        }
+        for i in 0..<1000 {
+            loops[i % loops.count].execute(task)
+        }
+        
+        defer {
+            for l in loops {
+                if let rl = l as? RunnableRunLoopType {
+                    rl.stop()
+                }
+            }
+        }
+        
         
         RunLoop.main.execute(.In(timeout: 0.1)) {
             (RunLoop.current as? RunnableRunLoopType)?.stop()
             print("The End")
         }
         
-        for _ in 0...1000 {
-            dispatch_async(queue) {
-                RunLoop.main.execute {
-                    print("lalala:", counter)
-                    counter += 1
-                }
-            }
-        }
-        
         let main = (RunLoop.main as? RunnableRunLoopType)
         main?.run()
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
+    #endif
     
     func testImmediateTimeout() {
         let expectation = self.expectation(withDescription: "OK TIMER")
@@ -72,6 +90,7 @@ class RunLoopTests: XCTestCase {
         case E2
     }
     
+    #if !os(Linux) || dispatch
     func testSyncToDispatch() {
         let dispatchLoop = DispatchRunLoop()
         
@@ -97,6 +116,7 @@ class RunLoopTests: XCTestCase {
         
         self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
+    #endif
     
     func testSyncToRunLoop() {
         let sema = RunLoop.current.semaphore()
@@ -138,6 +158,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(withTimeout: 0.1, handler: nil)
     }
     
+    #if !nouv
     func testUrgent() {
         let loop = UVRunLoop()
         
@@ -255,20 +276,23 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    #endif
 }
 
 #if os(Linux)
-extension RunLoopTests : XCTestCaseProvider {
-	var allTests : [(String, () throws -> Void)] {
+extension RunLoopTests {
+	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
 		return [
-			("testExample", testExample),
+			("testExecute", testExecute),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
-			("testSemaphoreStress", testSemaphoreStress),
-			("testSemaphoreExternal", testSemaphoreExternal),
 			("testSyncToDispatch", testSyncToDispatch),
 			("testSyncToRunLoop", testSyncToRunLoop),
 			("testUrgent", testUrgent),
+			("testBasicRelay", testBasicRelay),
+			("testAutorelay", testAutorelay),
+			("testStopUV", testStopUV),
+			("testNestedUV", testNestedUV),
 		]
 	}
 }
