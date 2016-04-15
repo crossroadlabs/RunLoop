@@ -128,15 +128,18 @@ class SemaphoreTests : XCTestCase {
 #if os(Linux)
 extension SemaphoreTests {
 	static var allTests : [(String, SemaphoreTests -> () throws -> Void)] {
-		return [
+        var tests:[(String, SemaphoreTests -> () throws -> Void)] = [
 			("testBlockingSemaphoreTimeout", testBlockingSemaphoreTimeout),
 			("testBlockingSemaphoreManySignalTimeout", testBlockingSemaphoreManySignalTimeout),
-			("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch),
-			("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch),
 			("testLoopSemaphoreStressUV", testLoopSemaphoreStressUV),
 			("testBlockingSemaphoreUV", testBlockingSemaphoreUV),
-			("testSemaphoreExternal", testSemaphoreExternal),
 		]
+        #if dispatch
+            tests.insert(("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch))
+            tests.insert(("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch))
+            tests.insert(("testSemaphoreExternal", testSemaphoreExternal))
+        #endif
+        return tests
 	}
 }
 #endif

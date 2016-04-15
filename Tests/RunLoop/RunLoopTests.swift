@@ -183,6 +183,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(withTimeout: 1, handler: nil)
     }
     
+    #if !os(Linux) || dispatch
     func testBasicRelay() {
         let dispatchLoop = DispatchRunLoop()
         let loop = UVRunLoop()
@@ -231,6 +232,7 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    #endif
     
     func testStopUV() {
         let rl = threadWithRunLoop(UVRunLoop).loop
@@ -282,18 +284,22 @@ class RunLoopTests: XCTestCase {
 #if os(Linux)
 extension RunLoopTests {
 	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
-		return [
+        var tests:[(String, RunLoopTests -> () throws -> Void)] = [
 			("testExecute", testExecute),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
-			("testSyncToDispatch", testSyncToDispatch),
 			("testSyncToRunLoop", testSyncToRunLoop),
 			("testUrgent", testUrgent),
-			("testBasicRelay", testBasicRelay),
-			("testAutorelay", testAutorelay),
 			("testStopUV", testStopUV),
 			("testNestedUV", testNestedUV),
 		]
+        #if dispatch
+            tests.insert(("testSyncToDispatch", testSyncToDispatch))
+            tests.insert(("testBasicRelay", testBasicRelay))
+            tests.insert(("testAutorelay", testAutorelay))
+        #endif
+        
+        return tests
 	}
 }
 #endif
