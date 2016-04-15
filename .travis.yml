@@ -31,7 +31,7 @@ matrix:
         file: $MODULE_NAME.framework.zip
         skip_cleanup: true
         on:
-          repo: crossroadlabs/ExecutionContext
+          repo: crossroadlabs/RunLoop
           tags: true
     - script:
         - ./build test
