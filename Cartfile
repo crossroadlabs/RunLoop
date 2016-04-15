@@ -1,2 +1,3 @@
 github "crossroadlabs/UV" "develop"
+github "crossroadlabs/Boilerplate" ~> 0.1
 github "crossroadlabs/Foundation3" ~> 0.1
