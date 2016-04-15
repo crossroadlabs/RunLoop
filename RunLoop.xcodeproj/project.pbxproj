@@ -64,7 +64,6 @@
 		92E409C91CBD03C8001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C11CBD03C2001ED069 /* Boilerplate.framework */; };
 		92E409CA1CBD03C8001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C21CBD03C2001ED069 /* Foundation3.framework */; };
 		92E409CB1CBD03C8001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C31CBD03C2001ED069 /* Result.framework */; };
-		92E409CC1CBD03C8001ED069 /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C41CBD03C2001ED069 /* XCTest3.framework */; };
 		92E409CD1CBD03CD001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C11CBD03C2001ED069 /* Boilerplate.framework */; };
 		92E409CE1CBD03CD001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C21CBD03C2001ED069 /* Foundation3.framework */; };
 		92E409CF1CBD03CD001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C31CBD03C2001ED069 /* Result.framework */; };
@@ -226,7 +225,6 @@
 				92E409CB1CBD03C8001ED069 /* Result.framework in Frameworks */,
 				92E409C91CBD03C8001ED069 /* Boilerplate.framework in Frameworks */,
 				92E409CA1CBD03C8001ED069 /* Foundation3.framework in Frameworks */,
-				92E409CC1CBD03C8001ED069 /* XCTest3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1201,6 +1199,7 @@
 				92E409731CBD004A001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E409741CBD004A001ED069 /* Build configuration list for PBXNativeTarget "RunLoopTests-iOS" */ = {
 			isa = XCConfigurationList;
@@ -1209,6 +1208,7 @@
 				92E409761CBD004A001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E409981CBD0182001ED069 /* Build configuration list for PBXNativeTarget "RunLoop-tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1217,6 +1217,7 @@
 				92E4099A1CBD0182001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E4099B1CBD0182001ED069 /* Build configuration list for PBXNativeTarget "RunLoopTests-tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1225,6 +1226,7 @@
 				92E4099D1CBD0182001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		92E409B41CBD0244001ED069 /* Build configuration list for PBXNativeTarget "RunLoop-watchOS" */ = {
 			isa = XCConfigurationList;
@@ -1233,6 +1235,7 @@
 				92E409B61CBD0244001ED069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
