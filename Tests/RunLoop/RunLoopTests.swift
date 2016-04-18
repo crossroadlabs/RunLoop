@@ -62,26 +62,39 @@ class RunLoopTests: XCTestCase {
         let loop = RunLoop.current
         loop.execute(.Immediate) {
             expectation.fulfill()
-//            (loop as? RunnableRunLoopType)?.stop()
+            #if os(Linux)
+                (loop as? RunnableRunLoopType)?.stop()
+            #endif
         }
-//        (loop as? RunnableRunLoopType)?.run()
+        #if os(Linux)
+            (loop as? RunnableRunLoopType)?.run()
+        #endif
         self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
     func testNested() {
-//        let rl = RunLoop.current as? RunnableRunLoopType
+        let rl = RunLoop.current as? RunnableRunLoopType // will be main
+        
         let outer = self.expectation(withDescription: "outer")
         let inner = self.expectation(withDescription: "inner")
-        RunLoop.main.execute {
-            RunLoop.main.execute {
+        rl?.execute {
+            rl?.execute {
                 inner.fulfill()
-//                rl?.stop()
+                #if os(Linux)
+                    rl?.stop()
+                #endif
             }
-//            rl?.run()
+            #if os(Linux)
+                rl?.run()
+            #endif
             outer.fulfill()
-//            rl?.stop()
+            #if os(Linux)
+                rl?.stop()
+            #endif
         }
-//        rl?.run()
+        #if os(Linux)
+            rl?.run()
+        #endif
         self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
