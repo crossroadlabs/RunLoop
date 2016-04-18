@@ -104,26 +104,26 @@ class RunLoopTests: XCTestCase {
         let outer = self.expectation(withDescription: "outer")
         let inner = self.expectation(withDescription: "inner")
         rl?.execute {
-            print("Execute called")
             rl?.execute {
                 print("Inner execute called")
                 inner.fulfill()
-                #if os(Linux)
+                #if os(Linux) && !dispatch
                     rl?.stop()
                 #endif
             }
-            #if os(Linux)
+            #if os(Linux) && !dispatch
                 rl?.run()
             #endif
+            print("Execute called")
             outer.fulfill()
-            #if os(Linux)
+            #if os(Linux) && !dispatch
                 rl?.stop()
             #endif
         }
         
-        self.waitForExpectations(withTimeout: 2, handler: nil)
+        self.waitForExpectations(withTimeout: 5, handler: nil)
         
-        #if os(Linux)
+        #if os(Linux) && !dispatch
             rl?.run()
         #endif
     }
