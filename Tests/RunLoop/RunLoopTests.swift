@@ -93,7 +93,11 @@ class RunLoopTests: XCTestCase {
     }
     
     func testNested() {
-        let rl = RunLoop.current as? RunnableRunLoopType // will be main
+        #if os(Linux)
+            let rl = RunLoop.current as? RunnableRunLoopType // will be main
+        #else
+            let rl = Optional<RunLoopType>(RunLoop.current) // will be main too.
+        #endif
         
         let outer = self.expectation(withDescription: "outer")
         let inner = self.expectation(withDescription: "inner")
@@ -114,10 +118,12 @@ class RunLoopTests: XCTestCase {
                 rl?.stop()
             #endif
         }
+        
+        self.waitForExpectations(withTimeout: 2, handler: nil)
+        
         #if os(Linux)
             rl?.run()
         #endif
-        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
     enum TestError : ErrorProtocol {
