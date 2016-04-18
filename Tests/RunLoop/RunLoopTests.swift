@@ -19,12 +19,11 @@ import Foundation3
 class RunLoopTests: XCTestCase {
     
     #if !nouv
-    func testExecute() {
+    func testUVExecute() {
         var counter = 0
         
         let task = {
             RunLoop.main.execute {
-                print("lalala:", counter)
                 counter += 1
             }
         }
@@ -49,11 +48,32 @@ class RunLoopTests: XCTestCase {
         
         RunLoop.main.execute(.In(timeout: 0.1)) {
             (RunLoop.current as? RunnableRunLoopType)?.stop()
-            print("The End")
+            print("The End. Counter: \(counter)")
         }
         
         let main = (RunLoop.main as? RunnableRunLoopType)
         main?.run()
+    }
+    #endif
+    
+    #if !os(Linux) || dispatch
+    func testDispatchExecute() {
+        let rl = DispatchRunLoop()
+        let count = 1000
+        var counter = 0
+        
+        let exp = self.expectation(withDescription: "OK EXECUTE")
+        
+        let task = {
+            counter += 1
+            if counter == count {
+                exp.fulfill()
+            }
+        }
+        for _ in 0..<count {
+            rl.execute(task)
+        }
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     #endif
     
@@ -300,7 +320,7 @@ class RunLoopTests: XCTestCase {
 extension RunLoopTests {
 	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
         var tests:[(String, RunLoopTests -> () throws -> Void)] = [
-			("testExecute", testExecute),
+			("testUVExecute", testUVExecute),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
 			("testSyncToRunLoop", testSyncToRunLoop),
@@ -309,6 +329,7 @@ extension RunLoopTests {
 			("testNestedUV", testNestedUV),
 		]
         #if dispatch
+            tests.insert(("testDispatchExecute", testDispatchExecute))
             tests.insert(("testSyncToDispatch", testSyncToDispatch))
             tests.insert(("testBasicRelay", testBasicRelay))
             tests.insert(("testAutorelay", testAutorelay))
