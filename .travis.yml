@@ -52,7 +52,7 @@ matrix:
         - export SWIFT_ROOT_DIR="${PWD}/${SWIFT_VERSION}-ubuntu14.04"
         - export PATH="${SWIFT_ROOT_DIR}/usr/bin:${PATH}"
         # dispatch build
-        - sudo apt-get install clang autoconf libtool pkg-config systemtap-sdt-dev libblocksruntime-dev libkqueue-dev libdispatch-dev libbsd-dev git make
+        - sudo apt-get install clang autoconf libtool pkg-config systemtap-sdt-dev libblocksruntime-dev libkqueue-dev libpthread-workqueue-dev libbsd-dev git make
         - git clone -b experimental/foundation https://github.com/apple/swift-corelibs-libdispatch.git
         - cd swift-corelibs-libdispatch
         - git submodule init
