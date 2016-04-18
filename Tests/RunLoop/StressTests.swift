@@ -112,9 +112,13 @@ class StressTests: XCTestCase {
 #if os(Linux)
 extension StressTests {
 	static var allTests : [(String, StressTests -> () throws -> Void)] {
-		return [
+        var tests:[(String, StressTests -> () throws -> Void)] = [
 			("testStressUV", testStressUV),
 		]
+        #if dispatch
+            tests.insert(("testStressDispatch", testStressDispatch))
+        #endif
+        return tests
 	}
 }
 #endif
