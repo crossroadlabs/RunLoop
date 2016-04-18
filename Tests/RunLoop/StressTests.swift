@@ -10,6 +10,10 @@ import XCTest
 import Boilerplate
 import Foundation
 
+#if !os(tvOS)
+    import XCTest3
+#endif
+
 @testable import RunLoop
 
 func threadWithRunLoop<RL: RunLoopType>(type: RL.Type) -> (thread:Thread, loop: RL) {
@@ -25,7 +29,7 @@ func threadWithRunLoop<RL: RunLoopType>(type: RL.Type) -> (thread:Thread, loop: 
     return (thread, loop!)
 }
 
-
+#if !os(tvOS)
 class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
@@ -34,10 +38,14 @@ class StressTests: XCTestCase {
     func testStressUV() {
         let lock = NSLock()
         var counter = 0
+        let exp = self.expectation(withDescription: "WAIT UV")
         
         let task = {
             lock.lock()
             counter += 1
+            if counter == self.threadCount * self.taskCount {
+                exp.fulfill()
+            }
             lock.unlock()
         }
         var loops = [RunLoopType]()
@@ -46,6 +54,7 @@ class StressTests: XCTestCase {
             let thAndLoop = threadWithRunLoop(UVRunLoop)
             loops.append(thAndLoop.loop)
         }
+        
         for _ in 0..<taskCount {
             for l in loops {
                 l.execute(task)
@@ -60,11 +69,9 @@ class StressTests: XCTestCase {
             }
         }
         
-        (RunLoop.current as? RunnableRunLoopType)?.run(.In(timeout: 10), once: false)
+        self.waitForExpectations(withTimeout: 20, handler: nil)
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
-        
-        XCTAssert(counter == threadCount*taskCount, "Timeout")
     }
     #endif
     
@@ -72,10 +79,14 @@ class StressTests: XCTestCase {
     func testStressDispatch() {
         let lock = NSLock()
         var counter = 0
+        let exp = self.expectation(withDescription: "WAIT DISPATCH")
         
         let task = {
             lock.lock()
             counter += 1
+            if counter == self.threadCount * self.taskCount {
+                exp.fulfill()
+            }
             lock.unlock()
         }
     
@@ -90,14 +101,13 @@ class StressTests: XCTestCase {
             }
         }
         
-        (RunLoop.current as? RunnableRunLoopType)?.run(.In(timeout: 10), once: false)
+        self.waitForExpectations(withTimeout: 20, handler: nil)
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
-        
-        XCTAssert(counter == threadCount*taskCount, "Timeout")
     }
     #endif
 }
+#endif
 
 #if os(Linux)
 extension StressTests {
