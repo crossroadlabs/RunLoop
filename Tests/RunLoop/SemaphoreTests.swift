@@ -80,7 +80,7 @@ class SemaphoreTests : XCTestCase {
             sema.signal()
         }
         
-        XCTAssert(sema.wait(.In(timeout: 1)))
+        XCTAssert(sema.wait(.In(timeout: 2)))
     }
     #endif
     
