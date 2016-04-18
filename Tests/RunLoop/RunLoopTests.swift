@@ -99,6 +99,8 @@ class RunLoopTests: XCTestCase {
             let rl = Optional<RunLoopType>(RunLoop.current) // will be main too.
         #endif
         
+        print("Current run loop: \(rl)")
+        
         let outer = self.expectation(withDescription: "outer")
         let inner = self.expectation(withDescription: "inner")
         rl?.execute {
