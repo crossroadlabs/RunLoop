@@ -37,6 +37,8 @@ matrix:
           tags: true
     - script:
         - ./build test
+        - ./build clean
+        - ./build test -Xswiftc -Ddispatch
       sudo: required
       dist: trusty
       language: generic
@@ -48,6 +50,16 @@ matrix:
         - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
+        # dispatch build
+        - sudo apt-get install autoconf libtool pkg-config systemtap-sdt-dev libblocksruntime-dev libkqueue-dev libbsd-dev git make
+        - git clone https://github.com/apple/swift-corelibs-libdispatch.git
+        - cd swift-corelibs-libdispatch
+        - git submodule init
+        - git submodule update
+        - sh ./autogen.sh
+        - ./configure --with-swift-toolchain="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr" --prefix="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr"
+        - make && make install
+        - cd ..
         # libuv v1
         - sudo add-apt-repository ppa:swiftexpress/swiftexpress --yes
         - sudo apt-get update
