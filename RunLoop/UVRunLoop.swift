@@ -19,6 +19,10 @@ import Boilerplate
 import UV
 import CUV
 
+#if dispatch
+    import Dispatch
+#endif
+
 private func makeMain() -> RunLoopType {
     // autorelay
     #if !os(Linux) || dispatch
