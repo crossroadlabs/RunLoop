@@ -324,6 +324,24 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    
+    func testNestedUVTimeoutRun() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        var counter = 0
+        
+        rl.execute {
+            rl.execute {
+                counter += 1
+            }
+            rl.run(.In(timeout: 2))
+            counter += 1
+        }
+        Thread.sleep(1)
+        XCTAssert(counter == 1)
+        Thread.sleep(1.5)
+        XCTAssert(counter == 2)
+        rl.stop()
+    }
     #endif
 }
 
@@ -338,6 +356,7 @@ extension RunLoopTests {
 			("testUrgent", testUrgent),
 			("testStopUV", testStopUV),
 			("testNestedUV", testNestedUV),
+			("testNestedUVTimeoutRun", testNestedUVTimeoutRun)
 		]
         #if dispatch
             tests.append(("testDispatchExecute", testDispatchExecute))
