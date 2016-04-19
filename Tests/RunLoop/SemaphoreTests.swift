@@ -64,7 +64,7 @@ class SemaphoreTests : XCTestCase {
             }
         }
         
-        self.waitForExpectations(withTimeout: 0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 1.0, handler: nil)
     }
     
     func testLoopSemaphoreStressDispatch() {
