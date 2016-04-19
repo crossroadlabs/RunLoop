@@ -8,8 +8,13 @@
 
 import XCTest
 import XCTest3
+import Foundation
 import Foundation3
 import Boilerplate
+
+#if os(Linux) && dispatch
+    import Dispatch
+#endif
 
 @testable import RunLoop
 
@@ -135,11 +140,11 @@ extension SemaphoreTests {
 			("testBlockingSemaphoreUV", testBlockingSemaphoreUV),
 		]
         #if dispatch
-            tests.insert(("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch))
-            tests.insert(("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch))
-            tests.insert(("testSemaphoreExternal", testSemaphoreExternal))
+            tests.append(("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch))
+            tests.append(("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch))
+            tests.append(("testSemaphoreExternal", testSemaphoreExternal))
         #endif
         return tests
-	}
+    }
 }
 #endif

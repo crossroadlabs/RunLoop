@@ -14,6 +14,10 @@ import Foundation
     import XCTest3
 #endif
 
+#if os(Linux) && dispatch
+    import Dispatch
+#endif
+
 @testable import RunLoop
 
 func threadWithRunLoop<RL: RunLoopType>(type: RL.Type) -> (thread:Thread, loop: RL) {
@@ -116,7 +120,7 @@ extension StressTests {
 			("testStressUV", testStressUV),
 		]
         #if dispatch
-            tests.insert(("testStressDispatch", testStressDispatch))
+            tests.append(("testStressDispatch", testStressDispatch))
         #endif
         return tests
 	}

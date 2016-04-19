@@ -340,10 +340,10 @@ extension RunLoopTests {
 			("testNestedUV", testNestedUV),
 		]
         #if dispatch
-            tests.insert(("testDispatchExecute", testDispatchExecute))
-            tests.insert(("testSyncToDispatch", testSyncToDispatch))
-            tests.insert(("testBasicRelay", testBasicRelay))
-            tests.insert(("testAutorelay", testAutorelay))
+            tests.append(("testDispatchExecute", testDispatchExecute))
+            tests.append(("testSyncToDispatch", testSyncToDispatch))
+            tests.append(("testBasicRelay", testBasicRelay))
+            tests.append(("testAutorelay", testAutorelay))
         #endif
         
         return tests
