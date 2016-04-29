@@ -8,8 +8,13 @@
 
 import XCTest
 import XCTest3
+import Foundation
 import Foundation3
 import Boilerplate
+
+#if os(Linux) && dispatch
+    import Dispatch
+#endif
 
 @testable import RunLoop
 
@@ -59,7 +64,7 @@ class SemaphoreTests : XCTestCase {
             }
         }
         
-        self.waitForExpectations(withTimeout: 0.2, handler: nil)
+        self.waitForExpectations(withTimeout: 1.0, handler: nil)
     }
     
     func testLoopSemaphoreStressDispatch() {
@@ -80,7 +85,7 @@ class SemaphoreTests : XCTestCase {
             sema.signal()
         }
         
-        XCTAssert(sema.wait(.In(timeout: 1)))
+        XCTAssert(sema.wait(.In(timeout: 2)))
     }
     #endif
     
@@ -128,15 +133,18 @@ class SemaphoreTests : XCTestCase {
 #if os(Linux)
 extension SemaphoreTests {
 	static var allTests : [(String, SemaphoreTests -> () throws -> Void)] {
-		return [
+        var tests:[(String, SemaphoreTests -> () throws -> Void)] = [
 			("testBlockingSemaphoreTimeout", testBlockingSemaphoreTimeout),
 			("testBlockingSemaphoreManySignalTimeout", testBlockingSemaphoreManySignalTimeout),
-			("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch),
-			("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch),
 			("testLoopSemaphoreStressUV", testLoopSemaphoreStressUV),
 			("testBlockingSemaphoreUV", testBlockingSemaphoreUV),
-			("testSemaphoreExternal", testSemaphoreExternal),
 		]
-	}
+        #if dispatch
+            tests.append(("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch))
+            tests.append(("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch))
+            tests.append(("testSemaphoreExternal", testSemaphoreExternal))
+        #endif
+        return tests
+    }
 }
 #endif

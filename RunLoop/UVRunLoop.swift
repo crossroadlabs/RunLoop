@@ -19,6 +19,10 @@ import Boilerplate
 import UV
 import CUV
 
+#if dispatch
+    import Dispatch
+#endif
+
 private func makeMain() -> RunLoopType {
     // autorelay
     #if !os(Linux) || dispatch
@@ -60,8 +64,13 @@ private func makeMain() -> RunLoopType {
                     
                     let data = CleanupData(thread: thread, loop: loop)
                     let arg = UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: Unmanaged.passRetained(AnyContainer(data))))
-                    dispatch_set_context(main, arg);
-                    dispatch_set_finalizer_f(main, cleanup)
+                    #if os(Linux)
+                        dispatch_set_context(UnsafePointer<dispatch_object_t>(main).pointee, arg);
+                        dispatch_set_finalizer_f(UnsafePointer<dispatch_object_t>(main).pointee, cleanup)
+                    #else
+                        dispatch_set_context(main, arg);
+                        dispatch_set_finalizer_f(main, cleanup)
+                    #endif
                 }
             }
         }

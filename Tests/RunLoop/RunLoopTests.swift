@@ -19,12 +19,11 @@ import Foundation3
 class RunLoopTests: XCTestCase {
     
     #if !nouv
-    func testExecute() {
+    func testUVExecute() {
         var counter = 0
         
         let task = {
             RunLoop.main.execute {
-                print("lalala:", counter)
                 counter += 1
             }
         }
@@ -49,11 +48,32 @@ class RunLoopTests: XCTestCase {
         
         RunLoop.main.execute(.In(timeout: 0.1)) {
             (RunLoop.current as? RunnableRunLoopType)?.stop()
-            print("The End")
+            print("The End. Counter: \(counter)")
         }
         
         let main = (RunLoop.main as? RunnableRunLoopType)
         main?.run()
+    }
+    #endif
+    
+    #if !os(Linux) || dispatch
+    func testDispatchExecute() {
+        let rl = DispatchRunLoop()
+        let count = 1000
+        var counter = 0
+        
+        let exp = self.expectation(withDescription: "OK EXECUTE")
+        
+        let task = {
+            counter += 1
+            if counter == count {
+                exp.fulfill()
+            }
+        }
+        for _ in 0..<count {
+            rl.execute(task)
+        }
+        self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     #endif
     
@@ -62,26 +82,52 @@ class RunLoopTests: XCTestCase {
         let loop = RunLoop.current
         loop.execute(.Immediate) {
             expectation.fulfill()
-//            (loop as? RunnableRunLoopType)?.stop()
+            #if os(Linux)
+                (loop as? RunnableRunLoopType)?.stop()
+            #endif
         }
-//        (loop as? RunnableRunLoopType)?.run()
+        #if os(Linux)
+            (loop as? RunnableRunLoopType)?.run()
+        #endif
         self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
     func testNested() {
-//        let rl = RunLoop.current as? RunnableRunLoopType
+        #if os(Linux)
+            let rl = RunLoop.current as? RunnableRunLoopType // will be main
+        #else
+            let rl = Optional<RunLoopType>(RunLoop.current) // will be main too.
+        #endif
+        
+        print("Current run loop: \(rl)")
+        
         let outer = self.expectation(withDescription: "outer")
         let inner = self.expectation(withDescription: "inner")
-        RunLoop.main.execute {
-            RunLoop.main.execute {
+        rl?.execute {
+            rl?.execute {
+                print("Inner execute called")
                 inner.fulfill()
-//                rl?.stop()
+                #if os(Linux) && !dispatch
+                    rl?.stop()
+                #endif
             }
-//            rl?.run()
+            #if os(Linux) && !dispatch
+                rl?.run()
+            #endif
+            print("Execute called")
             outer.fulfill()
-//            rl?.stop()
+            #if os(Linux) && !dispatch
+                rl?.stop()
+            #endif
         }
-//        rl?.run()
+        
+        #if os(Linux) && !dispatch
+            rl?.execute(.In(timeout: 2)) {
+                rl?.stop()
+            }
+            rl?.run()
+        #endif
+        
         self.waitForExpectations(withTimeout: 2, handler: nil)
     }
     
@@ -183,6 +229,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(withTimeout: 1, handler: nil)
     }
     
+    #if !os(Linux) || dispatch
     func testBasicRelay() {
         let dispatchLoop = DispatchRunLoop()
         let loop = UVRunLoop()
@@ -231,6 +278,7 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    #endif
     
     func testStopUV() {
         let rl = threadWithRunLoop(UVRunLoop).loop
@@ -276,24 +324,48 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(withTimeout: 0.2, handler: nil)
     }
+    
+    func testNestedUVTimeoutRun() {
+        let rl = threadWithRunLoop(UVRunLoop).loop
+        var counter = 0
+        
+        rl.execute {
+            rl.execute {
+                counter += 1
+            }
+            rl.run(.In(timeout: 2))
+            counter += 1
+        }
+        Thread.sleep(1)
+        XCTAssert(counter == 1)
+        Thread.sleep(1.5)
+        XCTAssert(counter == 2)
+        rl.stop()
+    }
     #endif
 }
 
 #if os(Linux)
 extension RunLoopTests {
 	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
-		return [
-			("testExecute", testExecute),
+        var tests:[(String, RunLoopTests -> () throws -> Void)] = [
+			("testUVExecute", testUVExecute),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
-			("testSyncToDispatch", testSyncToDispatch),
 			("testSyncToRunLoop", testSyncToRunLoop),
 			("testUrgent", testUrgent),
-			("testBasicRelay", testBasicRelay),
-			("testAutorelay", testAutorelay),
 			("testStopUV", testStopUV),
 			("testNestedUV", testNestedUV),
+			("testNestedUVTimeoutRun", testNestedUVTimeoutRun)
 		]
+        #if dispatch
+            tests.append(("testDispatchExecute", testDispatchExecute))
+            tests.append(("testSyncToDispatch", testSyncToDispatch))
+            tests.append(("testBasicRelay", testBasicRelay))
+            tests.append(("testAutorelay", testAutorelay))
+        #endif
+        
+        return tests
 	}
 }
 #endif
