@@ -343,7 +343,7 @@ class RunLoopTests: XCTestCase {
         rl.stop()
     }
     
-    #if os(Linux)
+    #if os(Linux) && !dispatch
     func testMainUVTimeoutRun() {
         let rl = UVRunLoop.main as! RunnableRunLoopType
         var counter = 0
@@ -383,6 +383,8 @@ extension RunLoopTests {
             tests.append(("testSyncToDispatch", testSyncToDispatch))
             tests.append(("testBasicRelay", testBasicRelay))
             tests.append(("testAutorelay", testAutorelay))
+        #else
+            tests.append(("testMainUVTimeoutRun", testMainUVTimeoutRun))
         #endif
         
         return tests
