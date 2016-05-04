@@ -342,6 +342,26 @@ class RunLoopTests: XCTestCase {
         XCTAssert(counter == 2)
         rl.stop()
     }
+    
+    #if os(Linux)
+    func testMainUVTimeoutRun() {
+        let rl = UVRunLoop.main as! RunnableRunLoopType
+        var counter = 0
+        
+        rl.execute {
+            rl.execute {
+                counter += 1
+            }
+            rl.run(.In(timeout: 2))
+            counter += 1
+        }
+        Thread.sleep(1)
+        XCTAssert(counter == 1)
+        Thread.sleep(1.5)
+        XCTAssert(counter == 2)
+        rl.stop()
+    }
+    #endif
     #endif
 }
 
