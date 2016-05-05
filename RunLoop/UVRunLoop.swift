@@ -90,7 +90,13 @@ private struct UVRunLoopTask {
     }
 }
 
+private struct UVRunLoopStopTimerStorage {
+    let timer: Timer
+    let runUntil: NSDate
+}
+
 private let _currentLoopSignature = try! ThreadLocal<NSUUID>()
+private let _currentLoopStopTimer = try! ThreadLocal<MutableAnyContainer<UVRunLoopStopTimerStorage>>()
 
 public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     typealias Semaphore = BlockingSemaphore
@@ -400,12 +406,33 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         defer {
             timer.close()
         }
+        
+        // we need to stop a parent Stop Timer before running. Because we have own. And restore on exit
+        let parentStopTimer = _currentLoopStopTimer.value
+        _currentLoopStopTimer.value = MutableAnyContainer(UVRunLoopStopTimerStorage(timer: timer, runUntil: until))
+        
+        defer {
+            // restoring parent timer in thread storage
+            _currentLoopStopTimer.value = parentStopTimer
+            
+            if let pt = parentStopTimer {
+                // Starting parent Stop Timer on the remaining time
+                let ti = pt.content.runUntil.timeIntervalSinceNow
+                try! pt.content.timer.start(Timeout.In(timeout: ti >= 0 ? ti : 0))
+            }
+        }
+        if let pt = parentStopTimer {
+            // stopping parent Stop Timer
+            try! pt.content.timer.stop()
+        }
+        
         while until.timeIntervalSinceNow >= 0 {
             _loop.run(mode)
             if once || self._stop.content {
                 break
             }
         }
+        
         return timedout
     }
     

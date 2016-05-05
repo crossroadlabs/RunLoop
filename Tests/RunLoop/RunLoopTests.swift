@@ -356,8 +356,8 @@ class RunLoopTests: XCTestCase {
             counter += 1
         }
         rl.run(.In(timeout: 1))
-        XCTAssert(counter == 1)
-        rl.run(.In(timeout: 2))
+        XCTAssert(counter == 2)
+        rl.run(.In(timeout: 1))
         XCTAssert(counter == 2)
     }
     #endif
