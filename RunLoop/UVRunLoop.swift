@@ -394,6 +394,9 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
             self._stop.content = false
         }
         
+        // Update internal time caches
+        _loop.updateTime()
+        
         let mode = once ? UV_RUN_ONCE : UV_RUN_DEFAULT
         var timedout:Bool = false
         //yes, fail if so. It's runtime error
