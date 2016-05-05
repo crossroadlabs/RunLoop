@@ -33,7 +33,7 @@ matrix:
         file: $MODULE_NAME.framework.zip
         skip_cleanup: true
         on:
-          repo: crossroadlabs/RunLoop
+          repo: reactive-swift/RunLoop
           tags: true
     - script:
         - ./build test
@@ -53,15 +53,15 @@ matrix:
         - export SWIFT_ROOT_DIR="${PWD}/${SWIFT_VERSION}-ubuntu14.04"
         - export PATH="${SWIFT_ROOT_DIR}/usr/bin:${PATH}"
         # dispatch build
-        - sudo apt-get install clang autoconf libtool pkg-config systemtap-sdt-dev libblocksruntime-dev libkqueue-dev libpthread-workqueue-dev libbsd-dev git make
-        - git clone -b experimental/foundation https://github.com/apple/swift-corelibs-libdispatch.git
-        - cd swift-corelibs-libdispatch
-        - git submodule init
-        - git submodule update
-        - sh ./autogen.sh
-        - ./configure --with-swift-toolchain="${SWIFT_ROOT_DIR}/usr" --prefix="${SWIFT_ROOT_DIR}/usr"
-        - make && make install
-        - cd ..
+        #- sudo apt-get install clang autoconf libtool pkg-config systemtap-sdt-dev libblocksruntime-dev libkqueue-dev libpthread-workqueue-dev libbsd-dev git make
+        #- git clone -b experimental/foundation https://github.com/apple/swift-corelibs-libdispatch.git
+        #- cd swift-corelibs-libdispatch
+        #- git submodule init
+        #- git submodule update
+        #- sh ./autogen.sh
+        #- ./configure --with-swift-toolchain="${SWIFT_ROOT_DIR}/usr" --prefix="${SWIFT_ROOT_DIR}/usr"
+        #- make && make install
+        #- cd ..
         # libuv v1
         - sudo add-apt-repository ppa:swiftexpress/swiftexpress --yes
         - sudo apt-get update

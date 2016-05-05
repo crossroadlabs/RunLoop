@@ -342,6 +342,25 @@ class RunLoopTests: XCTestCase {
         XCTAssert(counter == 2)
         rl.stop()
     }
+    
+    #if os(Linux) && !dispatch
+    func testMainUVTimeoutRun() {
+        let rl = UVRunLoop.main as! RunnableRunLoopType
+        var counter = 0
+        
+        rl.execute {
+            rl.execute {
+                counter += 1
+            }
+            rl.run(.In(timeout: 2))
+            counter += 1
+        }
+        rl.run(.In(timeout: 1))
+        XCTAssert(counter == 1)
+        rl.run(.In(timeout: 2))
+        XCTAssert(counter == 2)
+    }
+    #endif
     #endif
 }
 
@@ -363,6 +382,8 @@ extension RunLoopTests {
             tests.append(("testSyncToDispatch", testSyncToDispatch))
             tests.append(("testBasicRelay", testBasicRelay))
             tests.append(("testAutorelay", testAutorelay))
+        #else
+            tests.append(("testMainUVTimeoutRun", testMainUVTimeoutRun))
         #endif
         
         return tests
