@@ -65,7 +65,7 @@ matrix:
         # libuv v1
         - sudo add-apt-repository ppa:swiftexpress/swiftexpress --yes
         - sudo apt-get update
-        - sudo apt-get install libuv1-dev
+        - sudo apt-get install libuv1-dev --force-yes
         # get back home
         - cd $MODULE_NAME
         # get crossroad build script
