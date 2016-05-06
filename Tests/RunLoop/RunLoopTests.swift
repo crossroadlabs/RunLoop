@@ -122,10 +122,7 @@ class RunLoopTests: XCTestCase {
         }
         
         #if os(Linux) && !dispatch
-            rl?.execute(.In(timeout: 2)) {
-                rl?.stop()
-            }
-            rl?.run()
+            rl?.run(.In(timeout: 2))
         #endif
         
         self.waitForExpectations(withTimeout: 2, handler: nil)

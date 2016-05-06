@@ -96,7 +96,7 @@ private struct UVRunLoopStopTimerStorage {
 }
 
 private let _currentLoopSignature = try! ThreadLocal<NSUUID>()
-private let _currentLoopStopTimer = try! ThreadLocal<MutableAnyContainer<UVRunLoopStopTimerStorage>>()
+private let _currentLoopStopTimer = try! ThreadLocal<UVRunLoopStopTimerStorage>()
 
 public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     typealias Semaphore = BlockingSemaphore
@@ -407,21 +407,20 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         
         // we need to stop a parent Stop Timer before running. Because we have own. And restore on exit
         let parentStopTimer = _currentLoopStopTimer.value
-        _currentLoopStopTimer.value = MutableAnyContainer(UVRunLoopStopTimerStorage(timer: timer, runUntil: until))
+        _currentLoopStopTimer.value = UVRunLoopStopTimerStorage(timer: timer, runUntil: until)
         
         defer {
             // restoring parent timer in thread storage
             _currentLoopStopTimer.value = parentStopTimer
             
-            if let pt = parentStopTimer {
+            if let parentStopTimer = parentStopTimer {
                 // Starting parent Stop Timer on the remaining time
-                let ti = pt.content.runUntil.timeIntervalSinceNow
-                try! pt.content.timer.start(.In(timeout: ti >= 0 ? ti : 0))
+                try! parentStopTimer.timer.start(Timeout(until: parentStopTimer.runUntil))
             }
         }
-        if let pt = parentStopTimer {
+        if let parentStopTimer = parentStopTimer {
             // stopping parent Stop Timer
-            try! pt.content.timer.stop()
+            try! parentStopTimer.timer.stop()
         }
         
         //yes, fail if so. It's runtime error
