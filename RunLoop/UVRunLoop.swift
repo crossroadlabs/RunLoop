@@ -412,16 +412,12 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         defer {
             // restoring parent timer in thread storage
             _currentLoopStopTimer.value = parentStopTimer
-            
-            if let parentStopTimer = parentStopTimer {
-                // Starting parent Stop Timer on the remaining time
-                try! parentStopTimer.timer.start(Timeout(until: parentStopTimer.runUntil))
-            }
+            // Starting parent Stop Timer on the remaining time
+            try! parentStopTimer?.timer.start(Timeout(until: parentStopTimer!.runUntil))
         }
-        if let parentStopTimer = parentStopTimer {
-            // stopping parent Stop Timer
-            try! parentStopTimer.timer.stop()
-        }
+        
+        // stopping parent Stop Timer
+        try! parentStopTimer?.timer.stop()
         
         //yes, fail if so. It's runtime error
         try! timer.start(Timeout(until: until))
