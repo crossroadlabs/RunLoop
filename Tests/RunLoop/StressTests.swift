@@ -10,26 +10,22 @@ import XCTest
 import Boilerplate
 import Foundation
 
-#if !os(tvOS)
-    import XCTest3
-#endif
-
-#if os(Linux) && dispatch
+#if dispatch || !os(Linux)
     import Dispatch
 #endif
 
 @testable import RunLoop
 
-func threadWithRunLoop<RL: RunLoopType>(type: RL.Type) -> (thread:Thread, loop: RL) {
-    var sema: SemaphoreType
+func threadWithRunLoop<RL: RunLoopProtocol>(type: RL.Type) -> (thread:Boilerplate.Thread, loop: RL) {
+    var sema: SemaphoreProtocol
     sema = BlockingSemaphore()
     var loop: RL?
-    let thread = try! Thread {
+    let thread = try! Boilerplate.Thread {
         loop = RL.current as? RL
-        sema.signal()
-        (loop as? RunnableRunLoopType)?.run()
+        let _ = sema.signal()
+        let _ = (loop as? RunnableRunLoopProtocol)?.run()
     }
-    sema.wait()
+    let _ = sema.wait()
     return (thread, loop!)
 }
 
@@ -38,11 +34,11 @@ class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
     
-    #if !nouv
+    #if (os(Linux) && !nouv) || uv
     func testStressUV() {
         let lock = NSLock()
         var counter = 0
-        let exp = self.expectation(withDescription: "WAIT UV")
+        let exp = self.expectation(description: "WAIT UV")
         
         let task = {
             lock.lock()
@@ -52,7 +48,7 @@ class StressTests: XCTestCase {
             }
             lock.unlock()
         }
-        var loops = [RunLoopType]()
+        var loops = [RunLoopProtocol]()
         
         for _ in 0..<threadCount {
             let thAndLoop = threadWithRunLoop(UVRunLoop)
@@ -77,13 +73,13 @@ class StressTests: XCTestCase {
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
     }
-    #endif
+    #endif // (os(Linux) && !nouv) || uv
     
     #if !os(Linux) || dispatch
     func testStressDispatch() {
         let lock = NSLock()
         var counter = 0
-        let exp = self.expectation(withDescription: "WAIT DISPATCH")
+        let exp = self.expectation(description: "WAIT DISPATCH")
         
         let task = {
             lock.lock()
@@ -94,18 +90,18 @@ class StressTests: XCTestCase {
             lock.unlock()
         }
     
-        var loops = [RunLoopType]()
+        var loops = [RunLoopProtocol]()
         
         for _ in 0..<threadCount {
             loops.append(DispatchRunLoop())
         }
         for _ in 0..<taskCount {
             for l in loops {
-                l.execute(task)
+                l.execute(task: task)
             }
         }
         
-        self.waitForExpectations(withTimeout: 20, handler: nil)
+        self.waitForExpectations(timeout: 20, handler: nil)
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
     }

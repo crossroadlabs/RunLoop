@@ -19,9 +19,9 @@ import Foundation
 import Boilerplate
 import Result
 
-public extension RunLoopType {
-    private func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        if let settled = self as? SettledType where settled.isHome {
+public extension RunLoopProtocol {
+    private func syncThroughAsync<ReturnType>(task:@escaping () throws -> ReturnType) throws -> ReturnType {
+        if let settled = self as? Settled, settled.isHome {
             return try task()
         }
         
@@ -31,20 +31,20 @@ public extension RunLoopType {
         
         self.execute {
             defer {
-                sema.signal()
+                let _ = sema.signal()
             }
             result = materializeAny(task)
         }
         
-        sema.wait()
+        let _ = sema.wait()
         
         return try result!.dematerializeAny()
     }
     
-    private func syncThroughAsync2<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+    private func syncThroughAsync2<ReturnType>(task:@escaping () throws -> ReturnType) rethrows -> ReturnType {
         //rethrow hack
         return try {
-            try self.syncThroughAsync(task)
+            try self.syncThroughAsync(task: task)
         }()
     }
     
@@ -52,7 +52,7 @@ public extension RunLoopType {
         return try syncThroughAsync2(task)
     }*/
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
-        return try syncThroughAsync2(task)
+    public func sync<ReturnType>(task:@escaping () throws -> ReturnType) rethrows -> ReturnType {
+        return try syncThroughAsync2(task: task)
     }
 }

@@ -17,19 +17,19 @@
 import Foundation
 import Boilerplate
 
-public typealias RunLoopFactory = () -> RunLoopType
+public typealias RunLoopFactory = () -> RunLoopProtocol
 
 private class RunLoopData {
-    private var _loop:RunLoopType?
+    private var _loop:RunLoopProtocol?
     let factory:RunLoopFactory
     
     init(factory:RunLoopFactory) {
         self.factory = factory
     }
     
-    var loop:RunLoopType {
+    var loop:RunLoopProtocol {
         get {
-            if _loop == nil {
+            if nil == _loop {
                 _loop = factory()
             }
             // yes, it's always value
@@ -40,15 +40,15 @@ private class RunLoopData {
 
 private let _runLoopData = try! ThreadLocal<RunLoopData>()
 
-private func defaultRunLoopFactory() -> RunLoopType {
+private func defaultRunLoopFactory() -> RunLoopProtocol {
     return Thread.isMain ? RunLoop.main : RunLoop()
 }
 
-public extension RunLoopType {
-    public static var current:RunLoopType {
+public extension RunLoopProtocol {
+    public static var current:RunLoopProtocol {
         get {
             var value = _runLoopData.value
-            if value == nil {
+            if nil == value {
                 value = RunLoopData(factory: defaultRunLoopFactory)
                 _runLoopData.value = value
                 
@@ -62,7 +62,7 @@ public extension RunLoopType {
     /// sets RunLoopFactory for current thread if not set yet.
     /// returns: true if succesfully set, false otherwise
     public static func trySetFactory(factory:RunLoopFactory) -> Bool {
-        if _runLoopData.value == nil {
+        if nil == _runLoopData.value {
             _runLoopData.value = RunLoopData(factory: factory)
             return true
         } else {

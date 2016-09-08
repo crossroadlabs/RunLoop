@@ -7,12 +7,10 @@
 //
 
 import XCTest
-import XCTest3
 import Foundation
-import Foundation3
 import Boilerplate
 
-#if os(Linux) && dispatch
+#if dispatch || !os(Linux)
     import Dispatch
 #endif
 
@@ -24,58 +22,59 @@ class SemaphoreTests : XCTestCase {
     
     func testBlockingSemaphoreTimeout() {
         let sema = BlockingSemaphore()
-        let _ = try! Thread {
-            Thread.sleep(.In(timeout: 2))
+        let _ = try! Boilerplate.Thread {
+            Boilerplate.Thread.sleep(timeout: .In(timeout: 2))
             sema.signal()
         }
-        XCTAssert(!sema.wait(.In(timeout: 1)))
-        XCTAssert(sema.wait(.In(timeout: 2)))
+        XCTAssert(!sema.wait(timeout: .In(timeout: 1)))
+        XCTAssert(sema.wait(timeout: .In(timeout: 2)))
     }
     
     func testBlockingSemaphoreManySignalTimeout() {
         let count = 3
         let sema = BlockingSemaphore(value: count)
-        let _ = try! Thread {
+        let _ = try! Boilerplate.Thread {
             for _ in 0..<count {
                 sema.signal()
-                Thread.sleep(.In(timeout: 2))
+                Boilerplate.Thread.sleep(timeout: .In(timeout: 2))
             }
         }
         for _ in 0...count {
             sema.wait()
         }
         
-        XCTAssert(!sema.wait(.In(timeout: 1)))
-        XCTAssert(sema.wait(.In(timeout: 2)))
+        XCTAssert(!sema.wait(timeout: .In(timeout: 1)))
+        XCTAssert(sema.wait(timeout: .In(timeout: 2)))
     }
     
     #if !os(Linux) || dispatch
-    func stressSemaphoreDispatch<Semaphore: SemaphoreType>(type:Semaphore.Type) {
+    func stressSemaphoreDispatch<Semaphore: SemaphoreProtocol>(type:Semaphore.Type) {
         let id = NSUUID().uuidString
-        let queue = dispatch_queue_create(id, DISPATCH_QUEUE_CONCURRENT)
+        let queue = DispatchQueue(label: id, qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
+        
         let sema = Semaphore(value: 1)
         
         for i in 0..<taskCount {
-            let expectation = self.expectation(withDescription: "expectation \(i)")
-            dispatch_async(queue) {
+            let expectation = self.expectation(description: "expectation \(i)")
+            queue.async {
                 sema.wait()
                 expectation.fulfill()
                 sema.signal()
             }
         }
         
-        self.waitForExpectations(withTimeout: 1.0, handler: nil)
+        self.waitForExpectations(timeout: 1.0, handler: nil)
     }
     
     func testLoopSemaphoreStressDispatch() {
-        stressSemaphoreDispatch(RunLoopSemaphore)
+        stressSemaphoreDispatch(type: RunLoopSemaphore.self)
     }
     
     func testBlockingSemaphoreStressDispatch() {
-        stressSemaphoreDispatch(BlockingSemaphore)
+        stressSemaphoreDispatch(type: BlockingSemaphore.self)
     }
     
-    #if !nouv
+    #if (os(Linux) && !nouv) || uv
     func testSemaphoreExternal() {
         let loop = UVRunLoop()
         let sema = loop.semaphore()
@@ -87,11 +86,11 @@ class SemaphoreTests : XCTestCase {
         
         XCTAssert(sema.wait(.In(timeout: 2)))
     }
-    #endif
+    #endif //(os(Linux) && !nouv) || uv
     
     #endif
     
-    #if !nouv
+    #if (os(Linux) && !nouv) || uv
     func stressSemaphoreUV<Semaphore: SemaphoreType>(type: Semaphore.Type) {
         let loopCount = 10
         var loops:[UVRunLoop] = []
@@ -102,7 +101,7 @@ class SemaphoreTests : XCTestCase {
             loops.append(thAndLoop.loop)
         }
         for i in 0..<taskCount {
-            let expectation = self.expectation(withDescription: "expectation \(i)")
+            let expectation = self.expectation(description: "expectation \(i)")
             loops[(i % loopCount)].execute {
                 sema.wait()
                 expectation.fulfill()
@@ -116,18 +115,18 @@ class SemaphoreTests : XCTestCase {
             }
         }
         
-        self.waitForExpectations(withTimeout: 1, handler: nil)
+        self.waitForExpectations(timeout: 1, handler: nil)
     }
     
     func testLoopSemaphoreStressUV() {
-        stressSemaphoreUV(RunLoopSemaphore)
+        stressSemaphoreUV(RunLoopSemaphore.self)
     }
     
     func testBlockingSemaphoreUV() {
-        stressSemaphoreUV(BlockingSemaphore)
+        stressSemaphoreUV(BlockingSemaphore.self)
     }
     
-    #endif
+    #endif //(os(Linux) && !nouv) || uv
 }
 
 #if os(Linux)

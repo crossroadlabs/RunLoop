@@ -7,11 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		653D515C1CA54B8E007276AE /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; };
-		653D515D1CA54B91007276AE /* XCTest3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653D515A1CA54B87007276AE /* XCTest3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		653DBDB31CA47514001A3D36 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		653DBDB41CA4753B001A3D36 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; };
-		653DBDB51CA47543001A3D36 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 653DBDB21CA47514001A3D36 /* Foundation3.framework */; };
 		65525C171C92D37D002733E2 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C161C92D37D002733E2 /* Sync.swift */; };
 		65525C191C92E880002733E2 /* Relay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65525C181C92E880002733E2 /* Relay.swift */; };
 		65538C381C8F36650080D0CA /* DispatchRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65538C371C8F36650080D0CA /* DispatchRunLoop.swift */; };
@@ -20,13 +15,10 @@
 		658C314F1C8DAA8D009CCC7A /* RunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C314E1C8DAA8D009CCC7A /* RunLoop.swift */; };
 		658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; };
 		658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; };
-		658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; };
 		658C31601C8DACED009CCC7A /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; };
 		658C31611C8DACED009CCC7A /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; };
-		658C31621C8DACED009CCC7A /* UV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; };
 		658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31541C8DACCB009CCC7A /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31561C8DACCB009CCC7A /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 658C31581C8DACCB009CCC7A /* UV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		658C316A1C8DB81C009CCC7A /* UVRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31691C8DB81C009CCC7A /* UVRunLoop.swift */; };
 		658C316C1C8DBA19009CCC7A /* CurrentRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */; };
 		658C31721C8DE57A009CCC7A /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
@@ -62,27 +54,19 @@
 		92E409BB1CBD027C001ED069 /* Semaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658C31711C8DE57A009CCC7A /* Semaphore.swift */; };
 		92E409BD1CBD027C001ED069 /* DispatchRunLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65538C371C8F36650080D0CA /* DispatchRunLoop.swift */; };
 		92E409C91CBD03C8001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C11CBD03C2001ED069 /* Boilerplate.framework */; };
-		92E409CA1CBD03C8001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C21CBD03C2001ED069 /* Foundation3.framework */; };
 		92E409CB1CBD03C8001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C31CBD03C2001ED069 /* Result.framework */; };
 		92E409CD1CBD03CD001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C11CBD03C2001ED069 /* Boilerplate.framework */; };
-		92E409CE1CBD03CD001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C21CBD03C2001ED069 /* Foundation3.framework */; };
 		92E409CF1CBD03CD001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C31CBD03C2001ED069 /* Result.framework */; };
-		92E409D01CBD03CD001ED069 /* XCTest3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C41CBD03C2001ED069 /* XCTest3.framework */; };
 		92E409D71CBD040D001ED069 /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C11CBD03C2001ED069 /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92E409D81CBD040D001ED069 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C21CBD03C2001ED069 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409D91CBD040D001ED069 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C31CBD03C2001ED069 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92E409DA1CBD040D001ED069 /* XCTest3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409C41CBD03C2001ED069 /* XCTest3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409DE1CBD0427001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DB1CBD0427001ED069 /* Boilerplate.framework */; };
 		92E409DF1CBD0428001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DB1CBD0427001ED069 /* Boilerplate.framework */; };
-		92E409E01CBD0428001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DC1CBD0427001ED069 /* Foundation3.framework */; };
-		92E409E11CBD0428001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DC1CBD0427001ED069 /* Foundation3.framework */; };
 		92E409E21CBD0428001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; };
 		92E409E31CBD0428001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; };
 		92E409E51CBD0439001ED069 /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DB1CBD0427001ED069 /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409E61CBD0439001ED069 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DC1CBD0427001ED069 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409E71CBD0439001ED069 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409EB1CBD0455001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409E81CBD0455001ED069 /* Boilerplate.framework */; };
-		92E409EC1CBD0455001ED069 /* Foundation3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409E91CBD0455001ED069 /* Foundation3.framework */; };
 		92E409ED1CBD0455001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409EA1CBD0455001ED069 /* Result.framework */; };
 /* End PBXBuildFile section */
 
@@ -117,11 +101,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				653D515D1CA54B91007276AE /* XCTest3.framework in Copy Frameworks */,
-				653DBDB31CA47514001A3D36 /* Foundation3.framework in Copy Frameworks */,
 				658C31641C8DAD02009CCC7A /* Boilerplate.framework in Copy Frameworks */,
 				658C31651C8DAD02009CCC7A /* Result.framework in Copy Frameworks */,
-				658C31661C8DAD02009CCC7A /* UV.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -133,9 +114,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				92E409D71CBD040D001ED069 /* Boilerplate.framework in Copy Frameworks */,
-				92E409D81CBD040D001ED069 /* Foundation3.framework in Copy Frameworks */,
 				92E409D91CBD040D001ED069 /* Result.framework in Copy Frameworks */,
-				92E409DA1CBD040D001ED069 /* XCTest3.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -198,9 +177,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				653DBDB51CA47543001A3D36 /* Foundation3.framework in Frameworks */,
 				658C315A1C8DACCB009CCC7A /* Boilerplate.framework in Frameworks */,
-				658C315E1C8DACCB009CCC7A /* UV.framework in Frameworks */,
 				658C315C1C8DACCB009CCC7A /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -209,12 +186,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				653D515C1CA54B8E007276AE /* XCTest3.framework in Frameworks */,
 				658C313F1C8DA70D009CCC7A /* RunLoop.framework in Frameworks */,
-				653DBDB41CA4753B001A3D36 /* Foundation3.framework in Frameworks */,
 				658C31601C8DACED009CCC7A /* Boilerplate.framework in Frameworks */,
 				658C31611C8DACED009CCC7A /* Result.framework in Frameworks */,
-				658C31621C8DACED009CCC7A /* UV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,7 +198,6 @@
 			files = (
 				92E409CB1CBD03C8001ED069 /* Result.framework in Frameworks */,
 				92E409C91CBD03C8001ED069 /* Boilerplate.framework in Frameworks */,
-				92E409CA1CBD03C8001ED069 /* Foundation3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,8 +205,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E409CE1CBD03CD001ED069 /* Foundation3.framework in Frameworks */,
-				92E409D01CBD03CD001ED069 /* XCTest3.framework in Frameworks */,
 				92E409CD1CBD03CD001ED069 /* Boilerplate.framework in Frameworks */,
 				92E4096A1CBD004A001ED069 /* RunLoop.framework in Frameworks */,
 				92E409CF1CBD03CD001ED069 /* Result.framework in Frameworks */,
@@ -246,7 +217,6 @@
 			files = (
 				92E409E21CBD0428001ED069 /* Result.framework in Frameworks */,
 				92E409DE1CBD0427001ED069 /* Boilerplate.framework in Frameworks */,
-				92E409E01CBD0428001ED069 /* Foundation3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,7 +224,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E409E11CBD0428001ED069 /* Foundation3.framework in Frameworks */,
 				92E409DF1CBD0428001ED069 /* Boilerplate.framework in Frameworks */,
 				92E409911CBD0182001ED069 /* RunLoop.framework in Frameworks */,
 				92E409E31CBD0428001ED069 /* Result.framework in Frameworks */,
@@ -267,7 +236,6 @@
 			files = (
 				92E409ED1CBD0455001ED069 /* Result.framework in Frameworks */,
 				92E409EB1CBD0455001ED069 /* Boilerplate.framework in Frameworks */,
-				92E409EC1CBD0455001ED069 /* Foundation3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -804,6 +772,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -845,6 +814,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};

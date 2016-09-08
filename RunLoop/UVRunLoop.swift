@@ -14,6 +14,8 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
+#if uv || os(Linux)
+
 import Foundation
 import Boilerplate
 import UV
@@ -244,7 +246,7 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         self.urgentNoRelay {
             self.resign()
             
-            if self.relay == nil {
+            if nil == self.relay {
                 self._personalQueue.content.append(contentsOf: self._relayQueue.content)
                 self._relayQueue.content.removeAll()
             } else {
@@ -459,3 +461,5 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
         return _loop == other._loop
     }
 }
+
+#endif //uv || os(Linux)

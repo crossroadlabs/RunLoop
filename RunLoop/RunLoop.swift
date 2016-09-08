@@ -17,15 +17,15 @@
 import Foundation
 import Boilerplate
 
-public protocol SettledType {
+public protocol Settled {
     var isHome:Bool {get}
 }
 
-public protocol RunLoopType : NonStrictEquatable {
+public protocol RunLoopProtocol : NonStrictEquatable {
     init()
     
-    func semaphore() -> SemaphoreType
-    func semaphore(value:Int) -> SemaphoreType
+    func semaphore() -> SemaphoreProtocol
+    func semaphore(value:Int) -> SemaphoreProtocol
     
     /// tries to execute before other tasks
     func urgent(task:SafeTask)
@@ -38,12 +38,20 @@ public protocol RunLoopType : NonStrictEquatable {
     
     var native:Any {get}
     
-    static var main:RunLoopType {get}
+    static var main:RunLoopProtocol {get}
 }
 
-public protocol RunnableRunLoopType : RunLoopType {
+public extension RunLoopProtocol {
+    public static var reactive:Self.Type {
+        get {
+            return self
+        }
+    }
+}
+
+public protocol RunnableRunLoopProtocol : RunLoopProtocol {
     func run(timeout:Timeout, once:Bool) -> Bool
-    func run(until:NSDate, once:Bool) -> Bool
+    func run(until:Date, once:Bool) -> Bool
     
     func stop()
     
@@ -52,13 +60,13 @@ public protocol RunnableRunLoopType : RunLoopType {
     var protected:Bool {get set}
 }
 
-public extension RunnableRunLoopType {
+public extension RunnableRunLoopProtocol {
     func run(timeout:Timeout = .Infinity, once:Bool = false) -> Bool {
-        return self.run(timeout.timeSinceNow(), once: once)
+        return self.run(timeout: timeout, once: once)
     }
     
-    func run(until:NSDate) -> Bool {
-        return self.run(until, once: false)
+    func run(until:Date) -> Bool {
+        return self.run(until: until, once: false)
     }
 }
 
@@ -79,9 +87,9 @@ public extension RunnableRunLoopType {
         #endif
     #endif
 #else
-    #if nouv
-        public typealias RunLoop = DispatchRunLoop
-    #else
+    #if uv
         public typealias RunLoop = UVRunLoop
+    #else
+        public typealias RunLoop = DispatchRunLoop
     #endif
 #endif
