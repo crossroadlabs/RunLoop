@@ -24,8 +24,8 @@ public protocol Settled {
 public protocol RunLoopProtocol : NonStrictEquatable {
     init()
     
-    func semaphore() -> SemaphoreProtocol
-    func semaphore(value:Int) -> SemaphoreProtocol
+    //for private use
+    static func makeSemaphore(value:Int?, loop:RunLoopProtocol?) -> SemaphoreProtocol
     
     /// tries to execute before other tasks
     func urgent(task:SafeTask)
@@ -39,6 +39,16 @@ public protocol RunLoopProtocol : NonStrictEquatable {
     var native:Any {get}
     
     static var main:RunLoopProtocol {get}
+}
+
+public extension RunLoopProtocol {
+    static func semaphore(value:Int? = nil, loop:RunLoopProtocol? = RunLoop.current) -> SemaphoreProtocol {
+        guard let semaClass = loop.flatMap({type(of: $0)}) else {
+            return self.makeSemaphore(value: value, loop: loop)
+        }
+        
+        return semaClass.makeSemaphore(value: value, loop: loop)
+    }
 }
 
 public extension RunLoopProtocol {

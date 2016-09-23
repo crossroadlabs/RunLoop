@@ -12,6 +12,25 @@ import Boilerplate
 @testable import RunLoop
 
 class RunLoopTests: XCTestCase {
+    #if !os(Linux) || dispatch
+        func freshLoop() -> RunLoopProtocol {
+            let queue = DispatchQueue.global()
+            let loop = DispatchRunLoop(queue: queue)
+            return loop
+        }
+    #else
+        //FIXME
+        func freshLoop() -> RunLoopProtocol {
+            var loop = RunLoop.reactive.current
+            let sema = RunLoop.semaphore(loop: loop)
+            let thread = try! Boilerplate.Thread {
+                loop = RunLoop.current
+                sema.signal()
+                loop.flatMap({$0 as? RunnableRunLoopProtocol})?.run()
+            }
+            sema.wait()
+        }
+    #endif
     
     #if (os(Linux) && !nouv) || uv
     func testUVExecute() {
@@ -74,24 +93,20 @@ class RunLoopTests: XCTestCase {
     
     func testImmediateTimeout() {
         let expectation = self.expectation(description: "OK TIMER")
-        let loop = RunLoop.reactive.current
+        let loop = RunLoop.reactive.current!
         loop.execute(delay: .Immediate) {
             expectation.fulfill()
-            #if os(Linux)
-                (loop as? RunnableRunLoopType)?.stop()
-            #endif
+            (loop as? RunnableRunLoopProtocol)?.stop()
         }
-        #if os(Linux)
-            (loop as? RunnableRunLoopType)?.run()
-        #endif
+        let _ = (loop as? RunnableRunLoopProtocol)?.run()
         self.waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testNested() {
         #if os(Linux)
-            let rl = RunLoop.current as? RunnableRunLoopType // will be main
+            let rl = RunLoop.current.flatMap({$0 as? RunnableRunLoopProtocol}) // will be main
         #else
-            let rl = Optional<RunLoopProtocol>(RunLoop.current) // will be main too.
+            let rl = RunLoop.reactive.current // will be main too.
         #endif
         
         print("Current run loop: \(rl)")
@@ -102,21 +117,21 @@ class RunLoopTests: XCTestCase {
             rl?.execute {
                 print("Inner execute called")
                 inner.fulfill()
-                #if os(Linux) && !dispatch
+                #if (os(Linux) && !dispatch) || uv
                     rl?.stop()
                 #endif
             }
-            #if os(Linux) && !dispatch
+            #if (os(Linux) && !dispatch) || uv
                 rl?.run()
             #endif
             print("Execute called")
             outer.fulfill()
-            #if os(Linux) && !dispatch
+            #if (os(Linux) && !dispatch) || uv
                 rl?.stop()
             #endif
         }
         
-        #if os(Linux) && !dispatch
+        #if (os(Linux) && !dispatch) || uv
             rl?.run(.In(timeout: 2))
         #endif
         
@@ -157,16 +172,9 @@ class RunLoopTests: XCTestCase {
     #endif
     
     func testSyncToRunLoop() {
-        let sema = RunLoop.current.semaphore()
-        var loop:RunLoopProtocol = RunLoop.current
-        let thread = try! Boilerplate.Thread {
-            loop = RunLoop.current
-            sema.signal()
-            (loop as? RunnableRunLoopProtocol)?.run()
-        }
-        sema.wait()
+        var loop = freshLoop()
         
-        XCTAssertFalse(loop.isEqual(to: RunLoop.current))
+        XCTAssertFalse(RunLoop.reactive.current.map({$0.isEqual(to: loop)}) ?? false)
         
         let result = loop.sync {
             return "result"
@@ -190,8 +198,6 @@ class RunLoopTests: XCTestCase {
         } catch {
             XCTFail("shoud not reach this")
         }
-        
-        try! thread.join()
         
         self.waitForExpectations(timeout: 0.1, handler: nil)
     }

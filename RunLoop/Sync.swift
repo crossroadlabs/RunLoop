@@ -27,7 +27,11 @@ public extension RunLoopProtocol {
         
         var result:Result<ReturnType, AnyError>?
         
-        let sema = RunLoop.current.semaphore()
+        let sema = RunLoop.current.map { loop in
+            type(of: loop).semaphore(loop: loop)
+        }.getOr {
+            RunLoop.reactive.semaphore(loop: nil)
+        }
         
         self.execute {
             defer {

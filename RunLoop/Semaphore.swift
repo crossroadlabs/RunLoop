@@ -134,15 +134,29 @@ func ==<T>(lhs:HashableAnyContainer<T>, rhs:HashableAnyContainer<T>) -> Bool {
 
 private enum Wakeable {
     case Loop(loop:RunnableRunLoopProtocol)
-    case Sema(loop:RunLoopProtocol, sema:SemaphoreProtocol)
+    case LoopedSema(loop:RunLoopProtocol, sema:SemaphoreProtocol)
+    case Sema(sema:SemaphoreProtocol, leftovers:Array<SafeTask>)
 }
 
 private extension Wakeable {
-    init(loop:RunLoopProtocol) {
+    init(loop:RunLoopProtocol?) {
+        guard let loop = loop else {
+            self = .Sema(sema: RunLoop.semaphore(loop: nil), leftovers:[])
+            return
+        }
+        
         if let loop = loop as? RunnableRunLoopProtocol {
             self = .Loop(loop: loop)
         } else {
-            self = .Sema(loop:loop, sema: loop.semaphore())
+            self = .LoopedSema(loop:loop, sema: type(of: loop).semaphore(loop: loop))
+        }
+    }
+    
+    private static func wait(sema:SemaphoreProtocol, until:Date?) -> Bool {
+        if let until = until {
+            return sema.wait(until: until)
+        } else {
+            return sema.wait()
         }
     }
     
@@ -154,12 +168,11 @@ private extension Wakeable {
             } else {
                 return loop.run()
             }
-        case .Sema(_, let sema):
-            if let until = until {
-                return sema.wait(until: until)
-            } else {
-                return sema.wait()
-            }
+            //SWIFT BUG: crash
+        case .Sema(let sema, _)/*, .LoopedSema(_, let sema)*/:
+            return Wakeable.wait(sema: sema, until: until)
+        case .LoopedSema(_, let sema):
+            return Wakeable.wait(sema: sema, until: until)
         }
     }
     
@@ -170,11 +183,25 @@ private extension Wakeable {
                 task()
                 loop.stop()
             }
-        case .Sema(let loop, let sema):
+        case .LoopedSema(let loop, let sema):
             loop.execute {
                 task()
                 let _ = sema.signal()
             }
+        case .Sema(let sema, var leftovers):
+            leftovers.append(task)
+            let _ = sema.signal()
+        }
+    }
+    
+    func afterwake() {
+        switch self {
+        case .Sema(_, var leftovers):
+            while !leftovers.isEmpty {
+                leftovers.removeFirst()()
+            }
+        default:
+            break
         }
     }
 }
@@ -230,6 +257,7 @@ public class RunLoopSemaphore : SemaphoreProtocol {
             //}
             while !signaled && !timedout {
                 timedout = wakeable.waitWithConditionalDate(until: until)
+                wakeable.afterwake()
                 signaled = self.signaled.value ?? false
             }
             self.signaled.value = false

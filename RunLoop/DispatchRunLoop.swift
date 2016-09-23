@@ -85,6 +85,10 @@
             self.init(queue: queue)
         }
         
+        public class func makeSemaphore(value:Int?, loop:RunLoopProtocol?) -> SemaphoreProtocol {
+            return value.map({DispatchSemaphore(value: $0)}) ?? DispatchSemaphore()
+        }
+        
         public func semaphore() -> SemaphoreProtocol {
             return DispatchSemaphore()
         }
