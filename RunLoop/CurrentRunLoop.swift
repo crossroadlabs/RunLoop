@@ -23,7 +23,7 @@ private class RunLoopData {
     private var _loop:RunLoopProtocol?
     let factory:RunLoopFactory
     
-    init(factory:RunLoopFactory) {
+    init(factory:@escaping RunLoopFactory) {
         self.factory = factory
     }
     
@@ -66,7 +66,7 @@ public extension RunLoopProtocol {
     
     /// sets RunLoopFactory for current thread if not set yet.
     /// returns: true if succesfully set, false otherwise
-    public static func trySetFactory(factory:RunLoopFactory) -> Bool {
+    public static func trySetFactory(factory:@escaping RunLoopFactory) -> Bool {
         if nil == _runLoopData.value {
             _runLoopData.value = RunLoopData(factory: factory)
             return true

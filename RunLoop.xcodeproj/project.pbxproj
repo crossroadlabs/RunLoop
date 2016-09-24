@@ -135,8 +135,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		653D515A1CA54B87007276AE /* XCTest3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest3.framework; sourceTree = "<group>"; };
-		653DBDB21CA47514001A3D36 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		65525C161C92D37D002733E2 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		65525C181C92E880002733E2 /* Relay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relay.swift; sourceTree = "<group>"; };
 		65538C371C8F36650080D0CA /* DispatchRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchRunLoop.swift; sourceTree = "<group>"; };
@@ -148,7 +146,6 @@
 		658C314E1C8DAA8D009CCC7A /* RunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoop.swift; sourceTree = "<group>"; };
 		658C31541C8DACCB009CCC7A /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
 		658C31561C8DACCB009CCC7A /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
-		658C31581C8DACCB009CCC7A /* UV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UV.framework; sourceTree = "<group>"; };
 		658C31691C8DB81C009CCC7A /* UVRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UVRunLoop.swift; sourceTree = "<group>"; };
 		658C316B1C8DBA19009CCC7A /* CurrentRunLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentRunLoop.swift; sourceTree = "<group>"; };
 		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
@@ -309,11 +306,8 @@
 		658C31531C8DACCB009CCC7A /* Mac */ = {
 			isa = PBXGroup;
 			children = (
-				653D515A1CA54B87007276AE /* XCTest3.framework */,
-				653DBDB21CA47514001A3D36 /* Foundation3.framework */,
 				658C31541C8DACCB009CCC7A /* Boilerplate.framework */,
 				658C31561C8DACCB009CCC7A /* Result.framework */,
-				658C31581C8DACCB009CCC7A /* UV.framework */,
 			);
 			path = Mac;
 			sourceTree = "<group>";

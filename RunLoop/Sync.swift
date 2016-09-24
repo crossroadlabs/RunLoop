@@ -20,7 +20,7 @@ import Boilerplate
 import Result
 
 public extension RunLoopProtocol {
-    private func syncThroughAsync<ReturnType>(task:@escaping () throws -> ReturnType) throws -> ReturnType {
+    private func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) throws -> ReturnType {
         if let settled = self as? Settled, settled.isHome {
             return try task()
         }
@@ -45,7 +45,7 @@ public extension RunLoopProtocol {
         return try result!.dematerializeAny()
     }
     
-    private func syncThroughAsync2<ReturnType>(task:@escaping () throws -> ReturnType) rethrows -> ReturnType {
+    private func syncThroughAsync2<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         //rethrow hack
         return try {
             try self.syncThroughAsync(task: task)
@@ -56,7 +56,9 @@ public extension RunLoopProtocol {
         return try syncThroughAsync2(task)
     }*/
     
-    public func sync<ReturnType>(task:@escaping () throws -> ReturnType) rethrows -> ReturnType {
+    
+    //TODO: check if this gets called successfully with the default sync RunLoops
+    public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         return try syncThroughAsync2(task: task)
     }
 }

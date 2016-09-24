@@ -18,7 +18,7 @@ import Foundation
 import Boilerplate
 
 public extension RunLoopProtocol {
-    public func urgent(task:SafeTask) {
+    public func urgent(task:@escaping SafeTask) {
         if let relayable = self as? RelayRunLoopProtocol {
             relayable.urgent(relay: true, task: task)
         } else {
@@ -27,7 +27,7 @@ public extension RunLoopProtocol {
     }
     
     //anyways must be reimplemented in non-relayable runloop
-    public func execute(task: SafeTask) {
+    public func execute(task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
             CommonRuntimeError.NotImplemented(what: "You need to implement 'execute(task: SafeTask)' function").panic()
         }
@@ -35,14 +35,14 @@ public extension RunLoopProtocol {
     }
     
     //anyways must be reimplemented in non-relayable runloop
-    public func execute(delay:Timeout, task: SafeTask) {
+    public func execute(delay:Timeout, task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
             CommonRuntimeError.NotImplemented(what: "You need to implement 'execute(delay:Timeout, task: SafeTask)' function").panic()
         }
         relayable.execute(relay: true, delay: delay, task: task)
     }
     
-    public func urgentNoRelay(task:SafeTask) {
+    public func urgentNoRelay(task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
             self.urgent(task: task)
             return
@@ -50,7 +50,7 @@ public extension RunLoopProtocol {
         relayable.urgent(relay: false, task: task)
     }
     
-    public func executeNoRelay(task:SafeTask) {
+    public func executeNoRelay(task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
             self.execute(task: task)
             return
@@ -58,7 +58,7 @@ public extension RunLoopProtocol {
         relayable.execute(relay: false, task: task)
     }
     
-    func executeNoRelay(delay:Timeout, task:SafeTask) {
+    func executeNoRelay(delay:Timeout, task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
             self.execute(delay: delay, task: task)
             return
@@ -70,13 +70,13 @@ public extension RunLoopProtocol {
 public protocol RelayRunLoopProtocol : RunLoopProtocol {
     var relay:RunLoopProtocol? {get set}
     
-    func urgent(relay:Bool, task:SafeTask)
-    func execute(relay:Bool, task: SafeTask)
-    func execute(relay:Bool, delay:Timeout, task: SafeTask)
+    func urgent(relay:Bool, task:@escaping SafeTask)
+    func execute(relay:Bool, task:@escaping SafeTask)
+    func execute(relay:Bool, delay:Timeout, task:@escaping SafeTask)
 }
 
 public extension RelayRunLoopProtocol {
-    func urgent(relay:Bool, task:SafeTask) {
+    func urgent(relay:Bool, task:@escaping SafeTask) {
         self.execute(relay: relay, task: task)
     }
 }

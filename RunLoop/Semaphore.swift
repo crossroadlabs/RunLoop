@@ -176,7 +176,7 @@ private extension Wakeable {
         }
     }
     
-    func wake(task:SafeTask) {
+    func wake(task:@escaping SafeTask) {
         switch self {
         case .Loop(let loop):
             loop.execute {

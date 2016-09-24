@@ -28,9 +28,9 @@ public protocol RunLoopProtocol : NonStrictEquatable {
     static func makeSemaphore(value:Int?, loop:RunLoopProtocol?) -> SemaphoreProtocol
     
     /// tries to execute before other tasks
-    func urgent(task:SafeTask)
-    func execute(task:SafeTask)
-    func execute(delay:Timeout, task:SafeTask)
+    func urgent(task:@escaping SafeTask)
+    func execute(task:@escaping SafeTask)
+    func execute(delay:Timeout, task:@escaping SafeTask)
     
     // commented until @autoclosure is resolved in Swift 3.0
     //func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType

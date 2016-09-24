@@ -97,7 +97,7 @@
             return DispatchSemaphore(value: value)
         }
         
-        public func execute(task:SafeTask) {
+        public func execute(task:@escaping SafeTask) {
             _queue.async {
                 let _ = RunLoop.trySetFactory {
                     return self
@@ -106,7 +106,7 @@
             }
         }
         
-        public func execute(delay:Timeout, task:SafeTask) {
+        public func execute(delay:Timeout, task:@escaping SafeTask) {
             _queue.asyncAfter(deadline: delay.dispatchTime) {
                 let _ = RunLoop.trySetFactory {
                     return self
@@ -137,7 +137,7 @@
             return try dispatchSync(task)
         }*/
         
-        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+        public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
             return try dispatchSync(task: task)
         }
         
