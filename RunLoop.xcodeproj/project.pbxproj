@@ -64,7 +64,6 @@
 		92E409E21CBD0428001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; };
 		92E409E31CBD0428001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; };
 		92E409E51CBD0439001ED069 /* Boilerplate.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DB1CBD0427001ED069 /* Boilerplate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92E409E61CBD0439001ED069 /* Foundation3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DC1CBD0427001ED069 /* Foundation3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409E71CBD0439001ED069 /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409DD1CBD0427001ED069 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92E409EB1CBD0455001ED069 /* Boilerplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409E81CBD0455001ED069 /* Boilerplate.framework */; };
 		92E409ED1CBD0455001ED069 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92E409EA1CBD0455001ED069 /* Result.framework */; };
@@ -126,7 +125,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				92E409E51CBD0439001ED069 /* Boilerplate.framework in Copy Frameworks */,
-				92E409E61CBD0439001ED069 /* Foundation3.framework in Copy Frameworks */,
 				92E409E71CBD0439001ED069 /* Result.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -288,7 +286,7 @@
 				922485531CA1B05000618C00 /* EquatableTests.swift */,
 			);
 			name = RunLoopTests;
-			path = Tests/RunLoop;
+			path = Tests/RunLoopTests;
 			sourceTree = "<group>";
 		};
 		658C31521C8DACCB009CCC7A /* Frameworks */ = {
@@ -878,7 +876,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "xyz.crossroadlabs.RunLoopTests-OSX";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -893,7 +891,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "xyz.crossroadlabs.RunLoopTests-OSX";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -962,7 +960,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-Dnouv";
@@ -981,7 +979,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-Dnouv";
@@ -1053,7 +1051,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
@@ -1071,7 +1069,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = Tests/RunLoop/Info.plist;
+				INFOPLIST_FILE = Tests/RunLoopTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoopTests;
