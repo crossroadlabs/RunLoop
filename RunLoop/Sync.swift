@@ -37,7 +37,7 @@ public extension RunLoopProtocol {
             defer {
                 let _ = sema.signal()
             }
-            result = materializeAny(task)
+            result = materialize(task)
         }
         
         let _ = sema.wait()

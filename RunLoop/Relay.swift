@@ -29,7 +29,7 @@ public extension RunLoopProtocol {
     //anyways must be reimplemented in non-relayable runloop
     public func execute(task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
-            CommonRuntimeError.NotImplemented(what: "You need to implement 'execute(task: SafeTask)' function").panic()
+            CommonRuntimeError.notImplemented(what: "You need to implement 'execute(task: SafeTask)' function").panic()
         }
         relayable.execute(relay: true, task: task)
     }
@@ -37,7 +37,7 @@ public extension RunLoopProtocol {
     //anyways must be reimplemented in non-relayable runloop
     public func execute(delay:Timeout, task:@escaping SafeTask) {
         guard let relayable = self as? RelayRunLoopProtocol else {
-            CommonRuntimeError.NotImplemented(what: "You need to implement 'execute(delay:Timeout, task: SafeTask)' function").panic()
+            CommonRuntimeError.notImplemented(what: "You need to implement 'execute(delay:Timeout, task: SafeTask)' function").panic()
         }
         relayable.execute(relay: true, delay: delay, task: task)
     }

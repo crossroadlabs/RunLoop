@@ -126,7 +126,7 @@
                 var result:Result<ReturnType, AnyError>?
                 
                 _queue.sync {
-                    result = materializeAny(task)
+                    result = materialize(task)
                 }
                 
                 return try result!.dematerializeAny()
