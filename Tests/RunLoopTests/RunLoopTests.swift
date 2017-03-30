@@ -107,7 +107,7 @@ class RunLoopTests: XCTestCase {
     }
     
     func testNested() {
-        #if os(Linux)
+        #if uv
             let rl = RunLoop.current.flatMap({$0 as? RunnableRunLoopProtocol}) // will be main
         #else //os(Linux)
             let rl = RunLoop.reactive.current // will be main too.
