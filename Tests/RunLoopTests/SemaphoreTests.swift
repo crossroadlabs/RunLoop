@@ -131,8 +131,8 @@ class SemaphoreTests : XCTestCase {
 
 #if os(Linux)
 extension SemaphoreTests {
-	static var allTests : [(String, SemaphoreTests -> () throws -> Void)] {
-        var tests:[(String, SemaphoreTests -> () throws -> Void)] = [
+	static var allTests : [(String, (SemaphoreTests) -> () throws -> Void)] {
+        var tests:[(String, (SemaphoreTests) -> () throws -> Void)] = [
 			("testBlockingSemaphoreTimeout", testBlockingSemaphoreTimeout),
 			("testBlockingSemaphoreManySignalTimeout", testBlockingSemaphoreManySignalTimeout),
 		]

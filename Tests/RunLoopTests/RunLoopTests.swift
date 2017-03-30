@@ -364,14 +364,14 @@ class RunLoopTests: XCTestCase {
 
 #if os(Linux)
 extension RunLoopTests {
-	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
-        var tests:[(String, RunLoopTests -> () throws -> Void)] = [
+	static var allTests : [(String, (RunLoopTests) -> () throws -> Void)] {
+        var tests:[(String, (RunLoopTests) -> () throws -> Void)] = [
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
 			("testSyncToRunLoop", testSyncToRunLoop),
-			("testUrgent", testUrgent),
 		]
         #if uv
+            tests.append(("testUrgent", testUrgent))
             tests.append(("testUVExecute", testUVExecute))
             tests.append(("testStopUV", testStopUV))
             tests.append(("testNestedUV", testNestedUV))

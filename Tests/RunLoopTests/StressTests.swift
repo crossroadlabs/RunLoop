@@ -111,8 +111,8 @@ class StressTests: XCTestCase {
 
 #if os(Linux)
 extension StressTests {
-	static var allTests : [(String, StressTests -> () throws -> Void)] {
-        var tests:[(String, StressTests -> () throws -> Void)] = []
+	static var allTests : [(String, (StressTests) -> () throws -> Void)] {
+        var tests:[(String, (StressTests) -> () throws -> Void)] = []
         #if uv
             tests.append(("testStressUV", testStressUV))
         #endif //!nodispatch

@@ -37,8 +37,8 @@ class EquatableTests : XCTestCase {
 
 #if os(Linux)
 extension EquatableTests {
-	static var allTests : [(String, EquatableTests -> () throws -> Void)] {
-        var tests:[(String, EquatableTests -> () throws -> Void)] = []
+	static var allTests : [(String, (EquatableTests) -> () throws -> Void)] {
+        var tests:[(String, (EquatableTests) -> () throws -> Void)] = []
         #if uv
             tests.append(("testUVEquatable", testUVEquatable))
         #endif //!nodispatch
