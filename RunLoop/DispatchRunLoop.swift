@@ -154,7 +154,7 @@
                 return false
             }
             //TODO: test
-            return self._queue == other._queue
+            return self._queue.id == other._queue.id
         }
     }
 #endif
