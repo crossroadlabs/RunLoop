@@ -9,7 +9,11 @@
 import XCTest
 import Boilerplate
 
-@testable import RunLoop
+#if !nodispatch
+    import Dispatch
+#endif //!nodispatch
+
+import RunLoop
 
 class RunLoopTests: XCTestCase {
     #if !nodispatch
