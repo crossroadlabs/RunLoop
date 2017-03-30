@@ -10,7 +10,7 @@ import XCTest
 import Foundation
 import Boilerplate
 
-#if dispatch || !os(Linux)
+#if !nodispatch
     import Dispatch
 #endif
 
@@ -47,7 +47,7 @@ class SemaphoreTests : XCTestCase {
         XCTAssert(sema.wait(timeout: .In(timeout: 2)))
     }
     
-    #if !os(Linux) || dispatch
+    #if !nodispatch
     func stressSemaphoreDispatch<Semaphore: SemaphoreProtocol>(type:Semaphore.Type) {
         let id = NSUUID().uuidString
         let queue = DispatchQueue(label: id, qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
@@ -74,7 +74,7 @@ class SemaphoreTests : XCTestCase {
         stressSemaphoreDispatch(type: BlockingSemaphore.self)
     }
     
-    #if (os(Linux) && !nouv) || uv
+    #if uv
     func testSemaphoreExternal() {
         let loop = UVRunLoop()
         let sema = loop.semaphore()
@@ -86,11 +86,11 @@ class SemaphoreTests : XCTestCase {
         
         XCTAssert(sema.wait(.In(timeout: 2)))
     }
-    #endif //(os(Linux) && !nouv) || uv
+    #endif //uv
     
-    #endif
+    #endif //!nodispatch
     
-    #if (os(Linux) && !nouv) || uv
+    #if uv
     func stressSemaphoreUV<Semaphore: SemaphoreType>(type: Semaphore.Type) {
         let loopCount = 10
         var loops:[UVRunLoop] = []
@@ -126,7 +126,7 @@ class SemaphoreTests : XCTestCase {
         stressSemaphoreUV(BlockingSemaphore.self)
     }
     
-    #endif //(os(Linux) && !nouv) || uv
+    #endif //uv
 }
 
 #if os(Linux)
@@ -135,14 +135,18 @@ extension SemaphoreTests {
         var tests:[(String, SemaphoreTests -> () throws -> Void)] = [
 			("testBlockingSemaphoreTimeout", testBlockingSemaphoreTimeout),
 			("testBlockingSemaphoreManySignalTimeout", testBlockingSemaphoreManySignalTimeout),
-			("testLoopSemaphoreStressUV", testLoopSemaphoreStressUV),
-			("testBlockingSemaphoreUV", testBlockingSemaphoreUV),
 		]
-        #if dispatch
+        #if uv
+            tests.append(("testLoopSemaphoreStressUV", testLoopSemaphoreStressUV))
+            tests.append(("testBlockingSemaphoreUV", testBlockingSemaphoreUV))
+        #endif //uv
+        #if !nodispatch
             tests.append(("testBlockingSemaphoreStressDispatch", testBlockingSemaphoreStressDispatch))
             tests.append(("testLoopSemaphoreStressDispatch", testLoopSemaphoreStressDispatch))
-            tests.append(("testSemaphoreExternal", testSemaphoreExternal))
-        #endif
+            #if uv
+                tests.append(("testSemaphoreExternal", testSemaphoreExternal))
+            #endif //uv
+        #endif //!nodispatch
         return tests
     }
 }

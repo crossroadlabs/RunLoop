@@ -14,20 +14,20 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
-#if uv || os(Linux)
+#if uv
 
 import Foundation
 import Boilerplate
 import UV
 import CUV
 
-#if dispatch
+#if !nodispatch
     import Dispatch
-#endif
+#endif //!nodispatch
 
 private func makeMain() -> RunLoopType {
     // autorelay
-    #if !os(Linux) || dispatch
+    #if !nodispatch
         let main = dispatch_get_main_queue()
         dispatch_async(main) {
             if var loop = RunLoop.main as? RelayRunLoopType {
@@ -76,7 +76,7 @@ private func makeMain() -> RunLoopType {
                 }
             }
         }
-    #endif
+    #endif //!nodispatch
     return UVRunLoop(loop: Loop.defaultLoop())
 }
 
@@ -462,4 +462,4 @@ public class UVRunLoop : RunnableRunLoopType, SettledType, RelayRunLoopType {
     }
 }
 
-#endif //uv || os(Linux)
+#endif //uv

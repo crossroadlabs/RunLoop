@@ -80,26 +80,12 @@ public extension RunnableRunLoopProtocol {
     }
 }
 
-#if os(Linux)
-    #if dispatch
-        #if nouv
-            public typealias RunLoop = DispatchRunLoop
-        #else
-            public typealias RunLoop = UVRunLoop
-        #endif
-    #else
-        #if nouv
-            private func error() {
-                let error = "You can not use 'nouv' key' without dispatch support"
-            }
-        #else
-            public typealias RunLoop = UVRunLoop
-        #endif
-    #endif
+#if uv
+    public typealias RunLoop = UVRunLoop
+#elseif !nodispatch
+    public typealias RunLoop = DispatchRunLoop
 #else
-    #if uv
-        public typealias RunLoop = UVRunLoop
-    #else
-        public typealias RunLoop = DispatchRunLoop
-    #endif
-#endif
+    private func error() {
+        let error = "You can not use 'nodispatch' key' without other (uv) run loop support"
+    }
+#endif //uv

@@ -10,7 +10,7 @@ import XCTest
 import Boilerplate
 import Foundation
 
-#if dispatch || !os(Linux)
+#if !nodispatch
     import Dispatch
 #endif
 
@@ -34,7 +34,7 @@ class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
     
-    #if (os(Linux) && !nouv) || uv
+    #if uv
     func testStressUV() {
         let lock = NSLock()
         var counter = 0
@@ -73,9 +73,9 @@ class StressTests: XCTestCase {
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
     }
-    #endif // (os(Linux) && !nouv) || uv
+    #endif //uv
     
-    #if !os(Linux) || dispatch
+    #if !nodispatch
     func testStressDispatch() {
         let lock = NSLock()
         var counter = 0
@@ -105,19 +105,20 @@ class StressTests: XCTestCase {
         
         print("Counter \(counter), maxValue: \(threadCount*taskCount)")
     }
-    #endif
+    #endif //!nodispatch
 }
-#endif
+#endif //!os(tvOS)
 
 #if os(Linux)
 extension StressTests {
 	static var allTests : [(String, StressTests -> () throws -> Void)] {
-        var tests:[(String, StressTests -> () throws -> Void)] = [
-			("testStressUV", testStressUV),
-		]
-        #if dispatch
+        var tests:[(String, StressTests -> () throws -> Void)] = []
+        #if uv
+            tests.append(("testStressUV", testStressUV))
+        #endif //!nodispatch
+        #if !nodispatch
             tests.append(("testStressDispatch", testStressDispatch))
-        #endif
+        #endif //!nodispatch
         return tests
 	}
 }

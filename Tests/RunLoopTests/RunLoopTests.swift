@@ -12,7 +12,7 @@ import Boilerplate
 @testable import RunLoop
 
 class RunLoopTests: XCTestCase {
-    #if !os(Linux) || dispatch
+    #if !nodispatch
         func freshLoop() -> RunLoopProtocol {
             let queue = DispatchQueue.global()
             let loop = DispatchRunLoop(queue: queue)
@@ -32,7 +32,7 @@ class RunLoopTests: XCTestCase {
         }
     #endif
     
-    #if (os(Linux) && !nouv) || uv
+    #if uv
     func testUVExecute() {
         var counter = 0
         
@@ -68,9 +68,9 @@ class RunLoopTests: XCTestCase {
         let main = (RunLoop.main as? RunnableRunLoopProtocol)
         main?.run()
     }
-    #endif //(os(Linux) && !nouv) || uv
+    #endif //uv
     
-    #if !os(Linux) || dispatch
+    #if !nodispatch
     func testDispatchExecute() {
         let rl = DispatchRunLoop()
         let count = 1000
@@ -89,7 +89,7 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(timeout: 2, handler: nil)
     }
-    #endif
+    #endif //!nodispatch
     
     func testImmediateTimeout() {
         let expectation = self.expectation(description: "OK TIMER")
@@ -105,9 +105,9 @@ class RunLoopTests: XCTestCase {
     func testNested() {
         #if os(Linux)
             let rl = RunLoop.current.flatMap({$0 as? RunnableRunLoopProtocol}) // will be main
-        #else
+        #else //os(Linux)
             let rl = RunLoop.reactive.current // will be main too.
-        #endif
+        #endif //os(Linux)
         
         print("Current run loop: \(rl)")
         
@@ -117,23 +117,23 @@ class RunLoopTests: XCTestCase {
             rl?.execute {
                 print("Inner execute called")
                 inner.fulfill()
-                #if (os(Linux) && !dispatch) || uv
+                #if uv
                     rl?.stop()
-                #endif
+                #endif //uv
             }
-            #if (os(Linux) && !dispatch) || uv
+            #if uv
                 rl?.run()
-            #endif
+            #endif //uv
             print("Execute called")
             outer.fulfill()
-            #if (os(Linux) && !dispatch) || uv
+            #if uv
                 rl?.stop()
-            #endif
+            #endif //uv
         }
         
-        #if (os(Linux) && !dispatch) || uv
+        #if uv
             rl?.run(.In(timeout: 2))
-        #endif
+        #endif //uv
         
         self.waitForExpectations(timeout: 2, handler: nil)
     }
@@ -143,7 +143,7 @@ class RunLoopTests: XCTestCase {
         case E2
     }
     
-    #if !os(Linux) || dispatch
+    #if !nodispatch
     func testSyncToDispatch() {
         let dispatchLoop = DispatchRunLoop()
         
@@ -169,7 +169,7 @@ class RunLoopTests: XCTestCase {
         
         self.waitForExpectations(timeout: 0.1, handler: nil)
     }
-    #endif
+    #endif //!nodispatch
     
     func testSyncToRunLoop() {
         var loop = freshLoop()
@@ -202,7 +202,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(timeout: 0.1, handler: nil)
     }
     
-    #if (os(Linux) && !nouv) || uv
+    #if uv
     func testUrgent() {
         let loop = UVRunLoop()
         
@@ -227,7 +227,7 @@ class RunLoopTests: XCTestCase {
         self.waitForExpectations(timeout: 1, handler: nil)
     }
     
-    #if !os(Linux) || dispatch
+    #if !nodispatch
     func testBasicRelay() {
         let dispatchLoop = DispatchRunLoop()
         let loop = UVRunLoop()
@@ -276,7 +276,7 @@ class RunLoopTests: XCTestCase {
         }
         self.waitForExpectations(timeout: 0.2, handler: nil)
     }
-    #endif
+    #endif //!nodispatch
     
     func testStopUV() {
         let rl = threadWithRunLoop(UVRunLoop.self).loop
@@ -341,7 +341,7 @@ class RunLoopTests: XCTestCase {
         rl.stop()
     }
     
-    #if os(Linux) && !dispatch
+    #if nodispatch
     func testMainUVTimeoutRun() {
         let rl = UVRunLoop.main as! RunnableRunLoopType
         var counter = 0
@@ -358,31 +358,34 @@ class RunLoopTests: XCTestCase {
         rl.run(.In(timeout: 1))
         XCTAssert(counter == 2)
     }
-    #endif
-    #endif //(os(Linux) && !nouv) || uv
+    #endif //nodispatch
+    #endif //uv
 }
 
 #if os(Linux)
 extension RunLoopTests {
 	static var allTests : [(String, RunLoopTests -> () throws -> Void)] {
         var tests:[(String, RunLoopTests -> () throws -> Void)] = [
-			("testUVExecute", testUVExecute),
 			("testImmediateTimeout", testImmediateTimeout),
 			("testNested", testNested),
 			("testSyncToRunLoop", testSyncToRunLoop),
 			("testUrgent", testUrgent),
-			("testStopUV", testStopUV),
-			("testNestedUV", testNestedUV),
-			("testNestedUVTimeoutRun", testNestedUVTimeoutRun)
 		]
-        #if dispatch
-            tests.append(("testDispatchExecute", testDispatchExecute))
-            tests.append(("testSyncToDispatch", testSyncToDispatch))
-            tests.append(("testBasicRelay", testBasicRelay))
-            tests.append(("testAutorelay", testAutorelay))
-        #else
+        #if uv
+            tests.append(("testUVExecute", testUVExecute))
+            tests.append(("testStopUV", testStopUV))
+            tests.append(("testNestedUV", testNestedUV))
+            tests.append(("testNestedUVTimeoutRun", testNestedUVTimeoutRun))
             tests.append(("testMainUVTimeoutRun", testMainUVTimeoutRun))
         #endif
+        #if !nodispatch
+            tests.append(("testDispatchExecute", testDispatchExecute))
+            tests.append(("testSyncToDispatch", testSyncToDispatch))
+            #if uv
+                tests.append(("testBasicRelay", testBasicRelay))
+                tests.append(("testAutorelay", testAutorelay))
+            #endif //uv
+        #endif //!nodispatch
         
         return tests
 	}
