@@ -29,7 +29,6 @@ func threadWithRunLoop<RL: RunLoopProtocol>(type: RL.Type) -> (thread:Boilerplat
     return (thread, loop!)
 }
 
-#if !os(tvOS)
 class StressTests: XCTestCase {
     let threadCount = 100
     let taskCount = 1000
@@ -107,7 +106,6 @@ class StressTests: XCTestCase {
     }
     #endif //!nodispatch
 }
-#endif //!os(tvOS)
 
 #if os(Linux)
 extension StressTests {

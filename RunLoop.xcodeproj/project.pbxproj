@@ -149,6 +149,7 @@
 		658C31711C8DE57A009CCC7A /* Semaphore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Semaphore.swift; sourceTree = "<group>"; };
 		922485531CA1B05000618C00 /* EquatableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquatableTests.swift; sourceTree = "<group>"; };
 		9237002A1CA076F8000042BA /* SemaphoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SemaphoreTests.swift; sourceTree = "<group>"; };
+		9250E0151E91218800A9F4ED /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		92A9EFF01CA069EE00A62F33 /* StressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StressTests.swift; sourceTree = "<group>"; };
 		92E409601CBD004A001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RunLoop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E409691CBD004A001ED069 /* RunLoopTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RunLoopTests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,14 +157,10 @@
 		92E409901CBD0182001ED069 /* RunLoopTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RunLoopTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E409AF1CBD0243001ED069 /* RunLoop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RunLoop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E409C11CBD03C2001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E409C21CBD03C2001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E409C31CBD03C2001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
-		92E409C41CBD03C2001ED069 /* XCTest3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest3.framework; sourceTree = "<group>"; };
 		92E409DB1CBD0427001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E409DC1CBD0427001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E409DD1CBD0427001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 		92E409E81CBD0455001ED069 /* Boilerplate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Boilerplate.framework; sourceTree = "<group>"; };
-		92E409E91CBD0455001ED069 /* Foundation3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Foundation3.framework; sourceTree = "<group>"; };
 		92E409EA1CBD0455001ED069 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -240,8 +237,9 @@
 		658C312A1C8DA70D009CCC7A = {
 			isa = PBXGroup;
 			children = (
-				658C31361C8DA70D009CCC7A /* RunLoop */,
-				658C31421C8DA70D009CCC7A /* RunLoopTests */,
+				9250E0151E91218800A9F4ED /* Package.swift */,
+				9250E0131E91214B00A9F4ED /* Sources */,
+				9250E0141E91215300A9F4ED /* Tests */,
 				658C31521C8DACCB009CCC7A /* Frameworks */,
 				658C31351C8DA70D009CCC7A /* Products */,
 			);
@@ -285,8 +283,7 @@
 				9237002A1CA076F8000042BA /* SemaphoreTests.swift */,
 				922485531CA1B05000618C00 /* EquatableTests.swift */,
 			);
-			name = RunLoopTests;
-			path = Tests/RunLoopTests;
+			path = RunLoopTests;
 			sourceTree = "<group>";
 		};
 		658C31521C8DACCB009CCC7A /* Frameworks */ = {
@@ -310,13 +307,27 @@
 			path = Mac;
 			sourceTree = "<group>";
 		};
+		9250E0131E91214B00A9F4ED /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				658C31361C8DA70D009CCC7A /* RunLoop */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		9250E0141E91215300A9F4ED /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				658C31421C8DA70D009CCC7A /* RunLoopTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		92E409BE1CBD0382001ED069 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
 				92E409C11CBD03C2001ED069 /* Boilerplate.framework */,
-				92E409C21CBD03C2001ED069 /* Foundation3.framework */,
 				92E409C31CBD03C2001ED069 /* Result.framework */,
-				92E409C41CBD03C2001ED069 /* XCTest3.framework */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -325,7 +336,6 @@
 			isa = PBXGroup;
 			children = (
 				92E409DB1CBD0427001ED069 /* Boilerplate.framework */,
-				92E409DC1CBD0427001ED069 /* Foundation3.framework */,
 				92E409DD1CBD0427001ED069 /* Result.framework */,
 			);
 			path = tvOS;
@@ -335,7 +345,6 @@
 			isa = PBXGroup;
 			children = (
 				92E409E81CBD0455001ED069 /* Boilerplate.framework */,
-				92E409E91CBD0455001ED069 /* Foundation3.framework */,
 				92E409EA1CBD0455001ED069 /* Result.framework */,
 			);
 			path = watchOS;
@@ -833,7 +842,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
@@ -859,7 +868,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
@@ -911,11 +920,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -937,11 +945,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -1003,10 +1010,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1029,10 +1035,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1094,10 +1099,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
@@ -1121,10 +1125,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
 				);
-				INFOPLIST_FILE = RunLoop/Info.plist;
+				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
