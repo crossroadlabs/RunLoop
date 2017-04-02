@@ -16,7 +16,7 @@
 
 import XCTest
 
-@testable import RunLoopTestSuite
+@testable import RunLoopTests
 
 XCTMain([
 	testCase(EquatableTests.allTests),

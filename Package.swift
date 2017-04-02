@@ -20,8 +20,8 @@ let package = Package(
     name: "RunLoop",
     targets: [Target(name: "RunLoop")],
     dependencies: [
-        .Package(url: "https://github.com/reactive-swift/UV.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/crossroadlabs/Foundation3.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/crossroadlabs/XCTest3.git", majorVersion: 0, minor: 1)
-    ]
+        .Package(url: "https://github.com/crossroadlabs/Boilerplate.git", majorVersion: 1, minor: 1)
+        //.Package(url: "https://github.com/reactive-swift/UV.git", majorVersion: 0, minor: 2)
+    ],
+    exclude: ["Carthage"]
 )

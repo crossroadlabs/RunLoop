@@ -19,32 +19,36 @@ import Foundation
 import Boilerplate
 import Result
 
-public extension RunLoopType {
-    private func syncThroughAsync<ReturnType>(task:() throws -> ReturnType) throws -> ReturnType {
-        if let settled = self as? SettledType where settled.isHome {
+public extension RunLoopProtocol {
+    private func syncThroughAsync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) throws -> ReturnType {
+        if let settled = self as? Settled, settled.isHome {
             return try task()
         }
         
         var result:Result<ReturnType, AnyError>?
         
-        let sema = RunLoop.current.semaphore()
+        let sema = RunLoop.current.map { loop in
+            type(of: loop).semaphore(loop: loop)
+        }.getOr {
+            RunLoop.reactive.semaphore(loop: nil)
+        }
         
         self.execute {
             defer {
-                sema.signal()
+                let _ = sema.signal()
             }
-            result = materializeAny(task)
+            result = materialize(task)
         }
         
-        sema.wait()
+        let _ = sema.wait()
         
         return try result!.dematerializeAny()
     }
     
-    private func syncThroughAsync2<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
+    private func syncThroughAsync2<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
         //rethrow hack
         return try {
-            try self.syncThroughAsync(task)
+            try self.syncThroughAsync(task: task)
         }()
     }
     
@@ -52,7 +56,9 @@ public extension RunLoopType {
         return try syncThroughAsync2(task)
     }*/
     
-    public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
-        return try syncThroughAsync2(task)
+    
+    //TODO: check if this gets called successfully with the default sync RunLoops
+    public func sync<ReturnType>(task:@escaping TaskWithResult<ReturnType>) rethrows -> ReturnType {
+        return try syncThroughAsync2(task: task)
     }
 }

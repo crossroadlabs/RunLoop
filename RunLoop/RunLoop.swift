@@ -17,20 +17,20 @@
 import Foundation
 import Boilerplate
 
-public protocol SettledType {
+public protocol Settled {
     var isHome:Bool {get}
 }
 
-public protocol RunLoopType : NonStrictEquatable {
+public protocol RunLoopProtocol : NonStrictEquatable {
     init()
     
-    func semaphore() -> SemaphoreType
-    func semaphore(value:Int) -> SemaphoreType
+    //for private use
+    static func makeSemaphore(value:Int?, loop:RunLoopProtocol?) -> SemaphoreProtocol
     
     /// tries to execute before other tasks
-    func urgent(task:SafeTask)
-    func execute(task:SafeTask)
-    func execute(delay:Timeout, task:SafeTask)
+    func urgent(task:@escaping SafeTask)
+    func execute(task:@escaping SafeTask)
+    func execute(delay:Timeout, task:@escaping SafeTask)
     
     // commented until @autoclosure is resolved in Swift 3.0
     //func sync<ReturnType>(@autoclosure(escaping) task:() throws -> ReturnType) rethrows -> ReturnType
@@ -38,12 +38,30 @@ public protocol RunLoopType : NonStrictEquatable {
     
     var native:Any {get}
     
-    static var main:RunLoopType {get}
+    static var main:RunLoopProtocol {get}
 }
 
-public protocol RunnableRunLoopType : RunLoopType {
+public extension RunLoopProtocol {
+    static func semaphore(value:Int? = nil, loop:RunLoopProtocol? = RunLoop.current) -> SemaphoreProtocol {
+        guard let semaClass = loop.flatMap({type(of: $0)}) else {
+            return self.makeSemaphore(value: value, loop: loop)
+        }
+        
+        return semaClass.makeSemaphore(value: value, loop: loop)
+    }
+}
+
+public extension RunLoopProtocol {
+    public static var reactive:Self.Type {
+        get {
+            return self
+        }
+    }
+}
+
+public protocol RunnableRunLoopProtocol : RunLoopProtocol {
     func run(timeout:Timeout, once:Bool) -> Bool
-    func run(until:NSDate, once:Bool) -> Bool
+    func run(until:Date, once:Bool) -> Bool
     
     func stop()
     
@@ -52,36 +70,22 @@ public protocol RunnableRunLoopType : RunLoopType {
     var protected:Bool {get set}
 }
 
-public extension RunnableRunLoopType {
+public extension RunnableRunLoopProtocol {
     func run(timeout:Timeout = .Infinity, once:Bool = false) -> Bool {
-        return self.run(timeout.timeSinceNow(), once: once)
+        return self.run(timeout: timeout, once: once)
     }
     
-    func run(until:NSDate) -> Bool {
-        return self.run(until, once: false)
+    func run(until:Date) -> Bool {
+        return self.run(until: until, once: false)
     }
 }
 
-#if os(Linux)
-    #if dispatch
-        #if nouv
-            public typealias RunLoop = DispatchRunLoop
-        #else
-            public typealias RunLoop = UVRunLoop
-        #endif
-    #else
-        #if nouv
-            private func error() {
-                let error = "You can not use 'nouv' key' without dispatch support"
-            }
-        #else
-            public typealias RunLoop = UVRunLoop
-        #endif
-    #endif
+#if uv
+    public typealias RunLoop = UVRunLoop
+#elseif !nodispatch
+    public typealias RunLoop = DispatchRunLoop
 #else
-    #if nouv
-        public typealias RunLoop = DispatchRunLoop
-    #else
-        public typealias RunLoop = UVRunLoop
-    #endif
-#endif
+    private func error() {
+        let error = "You can not use 'nodispatch' key' without other (uv) run loop support"
+    }
+#endif //uv

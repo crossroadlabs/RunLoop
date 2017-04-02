@@ -15,29 +15,28 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import Foundation3
 import Boilerplate
 
-public protocol SemaphoreType {
+public protocol SemaphoreProtocol {
     init()
     init(value: Int)
     
     func wait() -> Bool
-    func wait(until:NSDate) -> Bool
+    func wait(until:Date) -> Bool
     func wait(timeout: Timeout) -> Bool
     
     func signal() -> Int
 }
 
-public extension SemaphoreType {
-    public static var defaultValue:Int {
+public extension SemaphoreProtocol {
+    public static var `default`:Int {
         get {
             return 0
         }
     }
 }
 
-public extension SemaphoreType {
+public extension SemaphoreProtocol {
     /// Performs the wait operation on this semaphore until the timeout
     /// Returns true if the semaphore was signalled before the timeout occurred
     /// or false if the timeout occurred.
@@ -46,13 +45,13 @@ public extension SemaphoreType {
         case .Infinity:
             return wait()
         default:
-            return wait(timeout.timeSinceNow())
+            return wait(until: timeout.timeSinceNow())
         }
     }
 }
 
 private extension NSCondition {
-    func waitWithConditionalEnd(date:NSDate?) -> Bool {
+    func waitWithConditionalEnd(date:Date?) -> Bool {
         guard let date = date else {
             self.wait()
             return true
@@ -62,59 +61,59 @@ private extension NSCondition {
 }
 
 /// A wrapper around NSCondition
-public class BlockingSemaphore : SemaphoreType {
+public class BlockingSemaphore : SemaphoreProtocol {
     
     /// The underlying NSCondition
-    private(set) public var underlyingSemaphore: NSCondition
+    private(set) public var underlying: NSCondition
     private(set) public var value: Int
     
     /// Creates a new semaphore with the given initial value
     /// See NSCondition and https://developer.apple.com/library/prerelease/mac/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW13
     public required init(value: Int) {
-        self.underlyingSemaphore = NSCondition()
+        self.underlying = NSCondition()
         self.value = value
     }
     
     /// Creates a new semaphore with initial value 0
     /// This kind of semaphores is useful to protect a critical section
     public convenience required init() {
-        self.init(value: BlockingSemaphore.defaultValue)
+        self.init(value: BlockingSemaphore.default)
     }
     
     //TODO: optimise with atomics for value. Will allow to run not-blocked sema faster
-    private func waitWithConditionalDate(until:NSDate?) -> Bool {
-        underlyingSemaphore.lock()
+    private func waitWithConditionalDate(until:Date?) -> Bool {
+        underlying.lock()
         defer {
-            underlyingSemaphore.unlock()
+            underlying.unlock()
         }
         value -= 1
         
         var signaled:Bool = true
         if value < 0 {
-            signaled = underlyingSemaphore.waitWithConditionalEnd(until)
+            signaled = underlying.waitWithConditionalEnd(date: until)
         }
         
         return signaled
     }
     
     public func wait() -> Bool {
-        return waitWithConditionalDate(nil)
+        return waitWithConditionalDate(until: nil)
     }
     
     /// returns true on success (false if timeout expired)
     /// if nil is passed - waits forever
-    public func wait(until:NSDate) -> Bool {
-        return waitWithConditionalDate(until)
+    public func wait(until:Date) -> Bool {
+        return waitWithConditionalDate(until: until)
     }
     
     /// Performs the signal operation on this semaphore
     public func signal() -> Int {
-        underlyingSemaphore.lock()
+        underlying.lock()
         defer {
-            underlyingSemaphore.unlock()
+            underlying.unlock()
         }
         value += 1
-        underlyingSemaphore.signal()
+        underlying.signal()
         return value
     }
 }
@@ -134,53 +133,80 @@ func ==<T>(lhs:HashableAnyContainer<T>, rhs:HashableAnyContainer<T>) -> Bool {
 }
 
 private enum Wakeable {
-    case Loop(loop:RunnableRunLoopType)
-    case Sema(loop:RunLoopType, sema:SemaphoreType)
+    case Loop(loop:RunnableRunLoopProtocol)
+    case LoopedSema(loop:RunLoopProtocol, sema:SemaphoreProtocol)
+    case Sema(sema:SemaphoreProtocol, leftovers:Array<SafeTask>)
 }
 
 private extension Wakeable {
-    init(loop:RunLoopType) {
-        if let loop = loop as? RunnableRunLoopType {
+    init(loop:RunLoopProtocol?) {
+        guard let loop = loop else {
+            self = .Sema(sema: RunLoop.semaphore(loop: nil), leftovers:[])
+            return
+        }
+        
+        if let loop = loop as? RunnableRunLoopProtocol {
             self = .Loop(loop: loop)
         } else {
-            self = .Sema(loop:loop, sema: loop.semaphore())
+            self = .LoopedSema(loop:loop, sema: type(of: loop).semaphore(loop: loop))
         }
     }
     
-    func waitWithConditionalDate(until:NSDate?) -> Bool {
+    private static func wait(sema:SemaphoreProtocol, until:Date?) -> Bool {
+        if let until = until {
+            return sema.wait(until: until)
+        } else {
+            return sema.wait()
+        }
+    }
+    
+    func waitWithConditionalDate(until:Date?) -> Bool {
         switch self {
         case .Loop(let loop):
             if let until = until {
-                return loop.run(Timeout(until: until))
+                return loop.run(timeout: Timeout(until: until))
             } else {
                 return loop.run()
             }
-        case .Sema(_, let sema):
-            if let until = until {
-                return sema.wait(until)
-            } else {
-                return sema.wait()
-            }
+            //SWIFT BUG: crash
+        case .Sema(let sema, _)/*, .LoopedSema(_, let sema)*/:
+            return Wakeable.wait(sema: sema, until: until)
+        case .LoopedSema(_, let sema):
+            return Wakeable.wait(sema: sema, until: until)
         }
     }
     
-    func wake(task:SafeTask) {
+    func wake(task:@escaping SafeTask) {
         switch self {
         case .Loop(let loop):
             loop.execute {
                 task()
                 loop.stop()
             }
-        case .Sema(let loop, let sema):
+        case .LoopedSema(let loop, let sema):
             loop.execute {
                 task()
-                sema.signal()
+                let _ = sema.signal()
             }
+        case .Sema(let sema, var leftovers):
+            leftovers.append(task)
+            let _ = sema.signal()
+        }
+    }
+    
+    func afterwake() {
+        switch self {
+        case .Sema(_, var leftovers):
+            while !leftovers.isEmpty {
+                leftovers.removeFirst()()
+            }
+        default:
+            break
         }
     }
 }
 
-public class RunLoopSemaphore : SemaphoreType {
+public class RunLoopSemaphore : SemaphoreProtocol {
     private var signals:[SafeTask]
     private let lock:NSLock
     private var value:Int
@@ -198,7 +224,7 @@ public class RunLoopSemaphore : SemaphoreType {
     }
     
     //TODO: optimise with atomics for value. Will allow to run non-blocked sema faster
-    private func waitWithConditionalDate(until:NSDate?) -> Bool {
+    private func waitWithConditionalDate(until:Date?) -> Bool {
         lock.lock()
         defer {
             lock.unlock()
@@ -230,7 +256,8 @@ public class RunLoopSemaphore : SemaphoreType {
             //    lock.lock()
             //}
             while !signaled && !timedout {
-                timedout = wakeable.waitWithConditionalDate(until)
+                timedout = wakeable.waitWithConditionalDate(until: until)
+                wakeable.afterwake()
                 signaled = self.signaled.value ?? false
             }
             self.signaled.value = false
@@ -241,11 +268,11 @@ public class RunLoopSemaphore : SemaphoreType {
     }
     
     public func wait() -> Bool {
-        return waitWithConditionalDate(nil)
+        return waitWithConditionalDate(until: nil)
     }
     
-    public func wait(until:NSDate) -> Bool {
-        return waitWithConditionalDate(until)
+    public func wait(until:Date) -> Bool {
+        return waitWithConditionalDate(until: until)
     }
     
     public func signal() -> Int {

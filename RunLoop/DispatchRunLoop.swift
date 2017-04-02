@@ -14,77 +14,101 @@
 //limitations under the License.
 //===----------------------------------------------------------------------===//
 
-#if !os(Linux) || dispatch
+#if !nodispatch
     import Foundation
-    import Foundation3
     import Dispatch
     
     import Boilerplate
     import Result
     
-    public class DispatchSemaphore : SemaphoreType {
-        let sema:dispatch_semaphore_t
+    private extension DispatchQueue {
+        private static let _idKey = DispatchSpecificKey<UUID>()
+        
+        var id:UUID {
+            get {
+                guard let id = self.getSpecific(key: DispatchQueue._idKey) else {
+                    let newid = UUID()
+                    self.setSpecific(key: DispatchQueue._idKey, value: newid)
+                    return newid
+                }
+                return id
+            }
+        }
+        
+        static var id:UUID? {
+            get {
+                return self.getSpecific(key: DispatchQueue._idKey)
+            }
+        }
+    }
+    
+    public class DispatchSemaphore : SemaphoreProtocol {
+        let sema:Dispatch.DispatchSemaphore
         
         public required convenience init() {
             self.init(value: 0)
         }
         
         public required init(value: Int) {
-            self.sema = dispatch_semaphore_create(value)
+            self.sema = Dispatch.DispatchSemaphore(value: value)
         }
         
         public func wait() -> Bool {
-            return wait(.Infinity)
+            return wait(timeout: .Infinity)
         }
         
-        public func wait(until:NSDate) -> Bool {
-            return wait(Timeout(until: until))
+        public func wait(until:Date) -> Bool {
+            return wait(timeout: Timeout(until: until))
         }
         
         public func wait(timeout: Timeout) -> Bool {
             let time = timeout.dispatchTime
-            let result = dispatch_semaphore_wait(sema, time)
-            return result == 0
+            let result = sema.wait(timeout: time)
+            return result == .success
         }
         
         public func signal() -> Int {
-            return dispatch_semaphore_signal(sema)
+            return sema.signal()
         }
     }
     
-    public class DispatchRunLoop: RunLoopType, NonStrictEquatable {
-        private let _queue:dispatch_queue_t!
+    public class DispatchRunLoop: RunLoopProtocol, NonStrictEquatable {
+        private let _queue:DispatchQueue
         
-        public init(queue:dispatch_queue_t!) {
+        public init(queue:DispatchQueue) {
             self._queue = queue
         }
         
         public required convenience init() {
             let name = NSUUID().uuidString
-            let queue = dispatch_queue_create(name, nil)
+            let queue = DispatchQueue(label: name)
             self.init(queue: queue)
         }
         
-        public func semaphore() -> SemaphoreType {
+        public class func makeSemaphore(value:Int?, loop:RunLoopProtocol?) -> SemaphoreProtocol {
+            return value.map({DispatchSemaphore(value: $0)}) ?? DispatchSemaphore()
+        }
+        
+        public func semaphore() -> SemaphoreProtocol {
             return DispatchSemaphore()
         }
         
-        public func semaphore(value:Int) -> SemaphoreType {
+        public func semaphore(value:Int) -> SemaphoreProtocol {
             return DispatchSemaphore(value: value)
         }
         
-        public func execute(task:SafeTask) {
-            dispatch_async(_queue) {
-                RunLoop.trySetFactory {
+        public func execute(task:@escaping SafeTask) {
+            _queue.async {
+                let _ = RunLoop.trySetFactory {
                     return self
                 }
                 task()
             }
         }
         
-        public func execute(delay:Timeout, task:SafeTask) {
-            dispatch_after(delay.dispatchTime, _queue) {
-                RunLoop.trySetFactory {
+        public func execute(delay:Timeout, task:@escaping SafeTask) {
+            _queue.asyncAfter(deadline: delay.dispatchTime) {
+                let _ = RunLoop.trySetFactory {
                     return self
                 }
                 task()
@@ -95,14 +119,14 @@
             //rethrow hack
             return try {
                 //TODO: test
-                if dispatch_queue_get_label(self._queue) == dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) {
+                if let currentId = DispatchQueue.id, currentId == self._queue.id {
                     return try task()
                 }
                 
                 var result:Result<ReturnType, AnyError>?
                 
-                dispatch_sync(_queue) {
-                    result = materializeAny(task)
+                _queue.sync {
+                    result = materialize(task)
                 }
                 
                 return try result!.dematerializeAny()
@@ -113,8 +137,8 @@
             return try dispatchSync(task)
         }*/
         
-        public func sync<ReturnType>(task:() throws -> ReturnType) rethrows -> ReturnType {
-            return try dispatchSync(task)
+        public func sync<ReturnType>(task:TaskWithResult<ReturnType>) rethrows -> ReturnType {
+            return try dispatchSync(task: task)
         }
         
         public var native:Any {
@@ -123,14 +147,14 @@
             }
         }
         
-        public static let main:RunLoopType = DispatchRunLoop(queue: dispatch_get_main_queue())
+        public static let main:RunLoopProtocol = DispatchRunLoop(queue: DispatchQueue.main)
         
-        public func isEqualTo(other: NonStrictEquatable) -> Bool {
+        public func isEqual(to other: NonStrictEquatable) -> Bool {
             guard let other = other as? DispatchRunLoop else {
                 return false
             }
             //TODO: test
-            return dispatch_queue_get_label(self._queue) == dispatch_queue_get_label(other._queue)
+            return self._queue.id == other._queue.id
         }
     }
 #endif
