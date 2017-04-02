@@ -924,7 +924,6 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -950,7 +949,6 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -1015,7 +1013,6 @@
 				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1041,7 +1038,6 @@
 				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = appletvos;
@@ -1106,7 +1102,6 @@
 				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
@@ -1133,7 +1128,6 @@
 				INFOPLIST_FILE = Sources/RunLoop/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OTHER_SWIFT_FLAGS = "-Dnouv";
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.crossroadlabs.RunLoop;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 				SDKROOT = watchos;
